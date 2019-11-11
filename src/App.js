@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
-import { CssBaseline, Button } from '@material-ui/core';
+import { CssBaseline, Button, Container } from '@material-ui/core';
 import { Auth } from 'aws-amplify';
 
 import Routes from './Routes';
@@ -64,9 +64,9 @@ function App(props) {
             </>
           )}
         </Navigation>
-        <div className="App container">
+        <Container>
           <Routes appProps={{ isAuthenticated, userHasAuthenticated }} />
-        </div>
+        </Container>
       </>
     )
   );
