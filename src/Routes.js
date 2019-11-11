@@ -5,7 +5,7 @@ import AuthenticatedRoute from './components/AuthenticatedRoute';
 import UnauthenticatedRoute from './components/UnauthenticatedRoute';
 
 import Home from './containers/Home';
-import Login from './containers/Login';
+import Login from './containers/Login/Login';
 import Notes from './containers/Notes';
 import Signup from './containers/Signup/Signup';
 import NewNote from './containers/NewNote';
