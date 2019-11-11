@@ -8,7 +8,7 @@ import Home from './containers/Home/Home';
 import Login from './containers/Login/Login';
 import Notes from './containers/Notes';
 import Signup from './containers/Signup/Signup';
-import NewNote from './containers/NewNote';
+import NewNote from './containers/NewNote/NewNote';
 import Settings from './containers/Settings';
 import NotFound from './containers/NotFound';
 
