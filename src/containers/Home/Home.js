@@ -52,13 +52,8 @@ export default function Home(props) {
         </ListItem>
         {Boolean(notes.length) && <Divider />}
         {notes.map((note, i) => (
-          <Fragment>
-            <ListItem
-              key={note.noteId}
-              component={Link}
-              to={`/notes/${note.noteId}`}
-              button
-            >
+          <Fragment key={note.noteId}>
+            <ListItem component={Link} to={`/notes/${note.noteId}`} button>
               <ListItemText
                 primary={note.content.trim().split('\n')[0]}
                 secondary={
