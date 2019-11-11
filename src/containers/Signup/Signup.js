@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
-import { TextField } from '@material-ui/core';
-import {
-  HelpBlock,
-  FormGroup,
-  FormControl,
-  ControlLabel
-} from 'react-bootstrap';
+import { TextField, Container } from '@material-ui/core';
 import { Auth } from 'aws-amplify';
 
 import LoaderButton from '../../components/LoaderButton';
 
 import { useFormFields } from '../../libs/hooksLib';
-
-import './Signup.css';
 
 export default function Signup(props) {
   const [fields, handleFieldChange] = useFormFields({
@@ -152,8 +144,8 @@ export default function Signup(props) {
   }
 
   return (
-    <div className="Signup">
+    <Container maxWidth="sm">
       {newUser === null ? renderForm() : renderConfirmationForm()}
-    </div>
+    </Container>
   );
 }
