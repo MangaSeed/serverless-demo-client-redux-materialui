@@ -9,7 +9,7 @@ import Login from './containers/Login/Login';
 import Notes from './containers/Note/Notes';
 import Signup from './containers/Signup/Signup';
 import NewNote from './containers/NewNote/NewNote';
-import Settings from './containers/Settings';
+import Settings from './containers/Settings/Settings';
 import NotFound from './containers/NotFound/NotFound';
 
 export default function Routes({ appProps }) {
