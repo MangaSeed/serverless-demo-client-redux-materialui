@@ -10,8 +10,13 @@ export function Navigation({ children }) {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" className={classes.appBarHeader}>
-          <Link to="/">SCRATCH</Link>
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          className={classes.appBarHeader}
+        >
+          SCRATCH
         </Typography>
         {children}
       </Toolbar>
