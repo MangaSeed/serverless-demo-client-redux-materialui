@@ -1,4 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  FC,
+  ChangeEvent,
+  FormEvent,
+  MouseEvent
+} from 'react';
+import { RouteComponentProps } from 'react-router';
 import {
   Button,
   Container,
@@ -16,21 +25,29 @@ import config from '../../config';
 
 import { useNotesStyle } from './Notes.style';
 
-export default function Notes(props) {
+export interface INotes {
+  useId: string;
+  noteId: string;
+  content: string;
+  createdAt: number;
+  attachment?: string;
+  attachmentURL?: string;
+}
+
+const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
   const classes = useNotesStyle();
-  const file = useRef(null);
-  const [note, setNote] = useState(null);
+  const file = useRef<File | null>(null);
+  const [note, setNote] = useState<INotes | null>(null);
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    function loadNote() {
-      return API.get('notes', `/notes/${props.match.params.id}`);
-    }
+    const loadNote = () =>
+      API.get('notes', `/notes/${props.match.params.id}`, null);
 
-    async function onLoad() {
+    const onLoad = async () => {
       try {
         const note = await loadNote();
         const { content, attachment } = note;
@@ -44,34 +61,31 @@ export default function Notes(props) {
       } catch (e) {
         alert(e);
       }
-    }
+    };
 
     onLoad();
   }, [props.match.params.id]);
 
-  function validateForm() {
-    return content.length > 0;
-  }
+  const validateForm = () => content.length > 0;
+  const formatFilename = (str: string) => str.replace(/^\w+-/, '');
 
-  function formatFilename(str) {
-    return str.replace(/^\w+-/, '');
-  }
-
-  function handleFileChange(event) {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return;
     file.current = event.target.files[0];
     setFileName(file.current.name);
-  }
+  };
 
-  function saveNote(note) {
-    return API.put('notes', `/notes/${props.match.params.id}`, {
+  const saveNote = (note: { content: string; attachment: string }) =>
+    API.put('notes', `/notes/${props.match.params.id}`, {
       body: note
     });
-  }
 
-  async function handleSubmit(event) {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     let attachment;
 
-    event.preventDefault();
+    if (!note) return;
 
     if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
       alert(
@@ -97,13 +111,12 @@ export default function Notes(props) {
       alert(e);
       setIsLoading(false);
     }
-  }
+  };
 
-  function deleteNote() {
-    return API.del('notes', `/notes/${props.match.params.id}`);
-  }
+  const deleteNote = () =>
+    API.del('notes', `/notes/${props.match.params.id}`, null);
 
-  async function handleDelete(event) {
+  const handleDelete = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     const confirmed = window.confirm(
@@ -123,7 +136,7 @@ export default function Notes(props) {
       alert(e);
       setIsDeleting(false);
     }
-  }
+  };
 
   return (
     note && (
@@ -142,14 +155,14 @@ export default function Notes(props) {
             Attachment
           </Typography>
           {note.attachment && (
-            <Typography
-              variant="h6"
-              component="a"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={note.attachmentURL}
-            >
-              {formatFilename(note.attachment)}
+            <Typography variant="h6">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={note.attachmentURL}
+              >
+                {formatFilename(note.attachment)}
+              </a>
               <br />
             </Typography>
           )}
@@ -197,4 +210,6 @@ export default function Notes(props) {
       </Container>
     )
   );
-}
+};
+
+export default Notes;
