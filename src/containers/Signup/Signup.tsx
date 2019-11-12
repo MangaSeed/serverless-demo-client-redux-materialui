@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, FC, FormEvent } from 'react';
+import { RouteComponentProps } from 'react-router';
 import { TextField, Container } from '@material-ui/core';
 import { Auth } from 'aws-amplify';
+import { ISignUpResult } from 'amazon-cognito-identity-js';
 
 import LoaderButton from '../../components/LoaderButton';
 
 import { useFormFields } from '../../libs/hooksLib';
 
-export default function Signup(props) {
-  const [fields, handleFieldChange] = useFormFields({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    confirmationCode: ''
-  });
-  const [newUser, setNewUser] = useState(null);
+import { IAppProps } from '../../Routes';
+
+interface IFormFields {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  confirmationCode: string;
+}
+
+const INITIAL_FORM_FIELDS: IFormFields = {
+  email: '',
+  password: '',
+  confirmPassword: '',
+  confirmationCode: ''
+};
+
+const Signup: FC<IAppProps & RouteComponentProps> = props => {
+  const [fields, handleFieldChange] = useFormFields<IFormFields>(
+    INITIAL_FORM_FIELDS
+  );
+  const [newUser, setNewUser] = useState<ISignUpResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   function validateForm() {
@@ -28,13 +43,13 @@ export default function Signup(props) {
     return fields.confirmationCode.length > 0;
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setIsLoading(true);
 
     try {
-      const newUser = await Auth.signUp({
+      const newUser: ISignUpResult = await Auth.signUp({
         username: fields.email,
         password: fields.password
       });
@@ -46,7 +61,7 @@ export default function Signup(props) {
     }
   }
 
-  async function handleConfirmationSubmit(event) {
+  async function handleConfirmationSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setIsLoading(true);
@@ -148,4 +163,6 @@ export default function Signup(props) {
       {newUser === null ? renderForm() : renderConfirmationForm()}
     </Container>
   );
-}
+};
+
+export default Signup;
