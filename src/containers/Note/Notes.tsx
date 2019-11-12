@@ -75,7 +75,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
     setFileName(file.current.name);
   };
 
-  const saveNote = (note: { content: string; attachment: string }) =>
+  const saveNote = (note: { content: string; attachment?: string }) =>
     API.put('notes', `/notes/${props.match.params.id}`, {
       body: note
     });
