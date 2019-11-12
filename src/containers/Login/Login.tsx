@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent, FC } from 'react';
 import { Auth } from 'aws-amplify';
 import { TextField, Container } from '@material-ui/core';
 
+import { IAppProps } from '../../Routes';
+
 import LoaderButton from '../../components/LoaderButton';
+
 import { useFormFields } from '../../libs/hooksLib';
 
-export default function Login(props) {
+const Login: FC<IAppProps> = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [fields, handleFieldChange] = useFormFields({
     email: '',
     password: ''
   });
 
-  function validateForm() {
+  const validateForm = () => {
     return fields.email.length > 0 && fields.password.length > 0;
-  }
+  };
 
-  async function handleSubmit(event) {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setIsLoading(true);
@@ -28,7 +31,7 @@ export default function Login(props) {
       alert(e.message);
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Container maxWidth="sm">
@@ -68,4 +71,6 @@ export default function Login(props) {
       </form>
     </Container>
   );
-}
+};
+
+export default Login;
