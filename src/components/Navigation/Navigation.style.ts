@@ -4,6 +4,6 @@ export const useStyles = makeStyles({
   appBarHeader: {
     flex: 1,
     textDecoration: 'none',
-    color: '#FFF'
-  }
+    color: '#FFF',
+  },
 });

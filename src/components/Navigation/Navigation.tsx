@@ -8,10 +8,10 @@ const Navigation: FC = ({ children }) => {
   const classes = useStyles({});
 
   return (
-    <AppBar position='static'>
+    <AppBar position="static">
       <Toolbar>
-        <Typography variant='h6' className={classes.appBarHeader}>
-          <Link to='/'>{`Scratch - v${process.env.REACT_APP_VERSION}`}</Link>
+        <Typography variant="h6" className={classes.appBarHeader}>
+          <Link to="/">{`Scratch - v${process.env.REACT_APP_VERSION}`}</Link>
         </Typography>
         {children}
       </Toolbar>
