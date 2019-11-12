@@ -24,9 +24,7 @@ const Home: FC<IAppProps> = props => {
 
   useEffect(() => {
     async function onLoad() {
-      if (!props.checkedAuth) {
-        return;
-      }
+      if (!props.checkedAuth) return;
 
       try {
         const { data } = await loadNotes();
