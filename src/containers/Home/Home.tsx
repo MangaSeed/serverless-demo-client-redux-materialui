@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, FC } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Divider,
@@ -11,11 +11,15 @@ import {
 import { NoteAdd as NoteAddIcon } from '@material-ui/icons';
 import { API } from 'aws-amplify';
 
+import { INotes } from '../Note/Notes';
+
+import { IAppProps } from '../../Routes';
+
 import { useHomeStyle } from './Home.style';
 
-export default function Home(props) {
+const Home: FC<IAppProps> = props => {
   const classes = useHomeStyle();
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState<INotes[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -37,11 +41,9 @@ export default function Home(props) {
     onLoad();
   }, [props.isAuthenticated]);
 
-  function loadNotes() {
-    return API.get('notes', '/notes');
-  }
+  const loadNotes = () => API.get('notes', '/notes', null);
 
-  function renderNotesList(notes) {
+  const renderNotesList = (notes: INotes[]) => {
     return (
       <>
         <ListItem button component={Link} to="/notes/new">
@@ -66,25 +68,27 @@ export default function Home(props) {
         ))}
       </>
     );
-  }
+  };
 
-  function renderLander() {
+  const renderLander = () => {
     return (
       <Box className={classes.lander}>
         <h1>Scratch</h1>
         <p>A simple note taking app</p>
       </Box>
     );
-  }
+  };
 
-  function renderNotes() {
+  const renderNotes = () => {
     return (
       <Box>
         <h1>Your Notes</h1>
         <List>{!isLoading && renderNotesList(notes)}</List>
       </Box>
     );
-  }
+  };
 
   return props.isAuthenticated ? renderNotes() : renderLander();
-}
+};
+
+export default Home;
