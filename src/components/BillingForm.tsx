@@ -1,25 +1,78 @@
-import React, { useState } from 'react';
-import { CardElement, injectStripe } from 'react-stripe-elements';
+import React, { useState, useImperativeHandle, FormEvent, FC } from 'react';
+import {
+  CardElement,
+  injectStripe,
+  ReactStripeElements
+} from 'react-stripe-elements';
 import { TextField, Divider } from '@material-ui/core';
+import { useTheme, fade } from '@material-ui/core/styles';
+import { InputBaseComponentProps } from '@material-ui/core/InputBase';
 
 import LoaderButton from './LoaderButton';
 
 import { useFormFields } from '../libs/hooksLib';
 
-function StripeInput(props) {
-  const { component: Component, inputRef, ...other } = props;
-  const elementRef = React.useRef();
+const StripeInput: FC<InputBaseComponentProps> = props => {
+  const {
+    component: Component,
+    inputRef,
+    'aria-invalid': ariaInvalid,
+    'aria-describedby': ariaDescribeBy,
+    defaultValue,
+    required,
+    onKeyDown,
+    onKeyUp,
+    readOnly,
+    autoComplete,
+    autoFocus,
+    type,
+    name,
+    rows,
+    ...other
+  } = props;
+  const theme = useTheme();
+  const [mountNode, setMountNode] = useState();
 
-  React.useImperativeHandle(inputRef, () => ({
-    focus: () => elementRef.current.focus
-  }));
+  useImperativeHandle(
+    inputRef,
+    () => ({
+      focus: () => mountNode.focus()
+    }),
+    [mountNode]
+  );
 
   return (
-    <Component onReady={element => (elementRef.current = element)} {...other} />
+    <Component
+      onReady={setMountNode}
+      style={{
+        base: {
+          color: theme.palette.text.primary,
+          fontSize: `${theme.typography.fontSize}px`,
+          fontFamily: theme.typography.fontFamily,
+          '::placeholder': {
+            color: fade(theme.palette.text.primary, 0.42)
+          }
+        },
+        invalid: {
+          color: theme.palette.text.primary
+        }
+      }}
+      {...other}
+    />
   );
+};
+
+interface IBillingProps {
+  isLoading?: boolean;
+  onSubmit: (
+    storage: string,
+    token: ReactStripeElements.PatchedTokenResponse
+  ) => Promise<void>;
 }
 
-function BillingForm({ isLoading, onSubmit, ...props }) {
+const BillingForm: FC<
+  IBillingProps & ReactStripeElements.InjectedStripeProps
+> = ({ isLoading, onSubmit, ...props }) => {
   const [fields, handleFieldChange] = useFormFields({
     name: '',
     storage: ''
@@ -30,22 +83,27 @@ function BillingForm({ isLoading, onSubmit, ...props }) {
 
   isLoading = isProcessing || isLoading;
 
-  function validateForm() {
+  const validateForm = () => {
     return fields.name !== '' && fields.storage !== '' && isCardComplete;
-  }
+  };
 
-  function handleCardChange({ error, complete }) {
-    if (error) {
+  const handleCardChange = ({
+    complete,
+    error
+  }: ReactStripeElements.ElementChangeResponse) => {
+    if (error && error.message) {
       setCardError(error.message);
       setIsCardComplete(false);
     } else {
       setCardError('');
       setIsCardComplete(complete);
     }
-  }
+  };
 
-  async function handleSubmitClick(event) {
+  const handleSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!props.stripe) return;
 
     setIsProcessing(true);
 
@@ -56,7 +114,7 @@ function BillingForm({ isLoading, onSubmit, ...props }) {
     setIsProcessing(false);
 
     onSubmit(fields.storage, { token, error });
-  }
+  };
 
   return (
     <form onSubmit={handleSubmitClick}>
@@ -92,8 +150,8 @@ function BillingForm({ isLoading, onSubmit, ...props }) {
         variant="outlined"
         error={Boolean(cardError)}
         helperText={cardError ? cardError || 'Invalid' : ''}
-        onChange={handleCardChange}
         InputLabelProps={{ shrink: true }}
+        onChange={handleCardChange}
         InputProps={{
           inputProps: { component: CardElement },
           inputComponent: StripeInput
@@ -112,6 +170,6 @@ function BillingForm({ isLoading, onSubmit, ...props }) {
       </LoaderButton>
     </form>
   );
-}
+};
 
 export default injectStripe(BillingForm);
