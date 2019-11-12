@@ -24,6 +24,8 @@ const Settings: FC<RouteComponentProps> = props => {
     storage: string,
     { token, error }: ReactStripeElements.PatchedTokenResponse
   ) => {
+    if (!token) return;
+
     if (error) {
       alert(error);
       return;
