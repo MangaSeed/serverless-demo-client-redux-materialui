@@ -28,6 +28,7 @@ const StripeInput: FC<InputBaseComponentProps> = props => {
     type,
     name,
     rows,
+    handleCardChange,
     ...other
   } = props;
   const theme = useTheme();
@@ -41,8 +42,12 @@ const StripeInput: FC<InputBaseComponentProps> = props => {
     [mountNode]
   );
 
+  const handleChange = (event: ReactStripeElements.ElementChangeResponse) =>
+    handleCardChange(event);
+
   return (
     <Component
+      {...other}
       onReady={setMountNode}
       style={{
         base: {
@@ -57,7 +62,7 @@ const StripeInput: FC<InputBaseComponentProps> = props => {
           color: theme.palette.text.primary
         }
       }}
-      {...other}
+      onChange={handleChange}
     />
   );
 };
@@ -151,9 +156,8 @@ const BillingForm: FC<
         error={Boolean(cardError)}
         helperText={cardError ? cardError || 'Invalid' : ''}
         InputLabelProps={{ shrink: true }}
-        onChange={handleCardChange}
         InputProps={{
-          inputProps: { component: CardElement },
+          inputProps: { component: CardElement, handleCardChange },
           inputComponent: StripeInput
         }}
         fullWidth
