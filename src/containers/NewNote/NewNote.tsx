@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, FormEvent, ChangeEvent, FC } from 'react';
+import { RouteComponentProps } from 'react-router';
 import { Button, Container, TextField } from '@material-ui/core';
 import { API } from 'aws-amplify';
 
@@ -10,24 +11,24 @@ import config from '../../config';
 
 import { useNewNoteStyle } from './NewNote.style';
 
-export default function NewNote(props) {
-  const file = useRef(null);
+const NewNote: FC<RouteComponentProps> = props => {
+  const file = useRef<File | null>(null);
   const classes = useNewNoteStyle();
 
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  function validateForm() {
-    return content.length > 0;
-  }
+  const validateForm = () => content.length > 0;
 
-  function handleFileChange(event) {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return;
+
     file.current = event.target.files[0];
     setFileName(file.current.name);
-  }
+  };
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
@@ -51,11 +52,10 @@ export default function NewNote(props) {
     }
   }
 
-  function createNote(note) {
-    return API.post('notes', '/notes', {
+  const createNote = (note: { content: string; attachment: string }) =>
+    API.post('notes', '/notes', {
       body: note
     });
-  }
 
   return (
     <Container maxWidth="sm">
@@ -96,4 +96,6 @@ export default function NewNote(props) {
       </form>
     </Container>
   );
-}
+};
+
+export default NewNote;
