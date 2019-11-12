@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Grid } from '@material-ui/core';
 
-export default function NotFound() {
+const NotFound = () => {
   return (
     <Grid container justify="center">
       <Grid item>
@@ -11,3 +11,5 @@ export default function NotFound() {
     </Grid>
   );
 }
+
+export default NotFound;
