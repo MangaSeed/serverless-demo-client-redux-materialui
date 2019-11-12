@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 
-import { IRouteProps, IAppProps } from '../Routes';
+import { IRouteProps } from '../Routes';
 
 const querystring = (name: string, url = window.location.href) => {
   name = name.replace(/[[]]/g, '\\$&');

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RouterProps } from 'react-router';
 import { NavLink, withRouter } from 'react-router-dom';
 import { CssBaseline, Button, Container } from '@material-ui/core';
