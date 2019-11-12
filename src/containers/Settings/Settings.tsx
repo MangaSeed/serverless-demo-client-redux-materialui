@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
-import { Elements, StripeProvider } from 'react-stripe-elements';
+import React, { useState, FC } from 'react';
+import { RouteComponentProps } from 'react-router';
+import {
+  Elements,
+  StripeProvider,
+  ReactStripeElements
+} from 'react-stripe-elements';
 import { Container } from '@material-ui/core';
 import { API } from 'aws-amplify';
 
@@ -7,16 +12,18 @@ import BillingForm from '../../components/BillingForm';
 
 import config from '../../config';
 
-export default function Settings(props) {
+const Settings: FC<RouteComponentProps> = props => {
   const [isLoading, setIsLoading] = useState(false);
 
-  function billUser(details) {
-    return API.post('notes', '/billing', {
+  const billUser = (details: { storage: string; source: string }) =>
+    API.post('notes', '/billing', {
       body: details
     });
-  }
 
-  async function handleFormSubmit(storage, { token, error }) {
+  const handleFormSubmit = async (
+    storage: string,
+    { token, error }: ReactStripeElements.PatchedTokenResponse
+  ) => {
     if (error) {
       alert(error);
       return;
@@ -36,7 +43,7 @@ export default function Settings(props) {
       alert(e);
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Container maxWidth="sm">
@@ -47,4 +54,6 @@ export default function Settings(props) {
       </StripeProvider>
     </Container>
   );
-}
+};
+
+export default Settings;
