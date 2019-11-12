@@ -10,9 +10,9 @@ const Navigation: FC = ({ children }) => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" className={classes.appBarHeader}>
-          <Link to="/">SCRATCH</Link>
-        </Typography>
+        <Link to="/" className={classes.appBarHeader}>
+          <Typography variant="h6">SCRATCH</Typography>
+        </Link>
         {children}
       </Toolbar>
     </AppBar>
