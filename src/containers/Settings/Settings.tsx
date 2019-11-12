@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import {
   Elements,
   StripeProvider,
-  ReactStripeElements
+  ReactStripeElements,
 } from 'react-stripe-elements';
 import { Container } from '@material-ui/core';
 import { API } from 'aws-amplify';
@@ -17,7 +17,7 @@ const Settings: FC<RouteComponentProps> = props => {
 
   const billUser = (details: { storage: string; source: string }) =>
     API.post('notes', '/billing', {
-      body: details
+      body: details,
     });
 
   const handleFormSubmit = async (
@@ -36,7 +36,7 @@ const Settings: FC<RouteComponentProps> = props => {
     try {
       await billUser({
         storage,
-        source: token.id
+        source: token.id,
       });
 
       alert('Your card has been charged successfully!');
