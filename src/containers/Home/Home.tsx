@@ -6,7 +6,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Box
+  Box,
 } from '@material-ui/core';
 import { NoteAdd as NoteAddIcon } from '@material-ui/icons';
 import { API } from 'aws-amplify';
