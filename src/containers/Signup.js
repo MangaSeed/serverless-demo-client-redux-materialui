@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
-import { TextField, Container } from '@material-ui/core';
-import { Auth } from 'aws-amplify';
-
-import LoaderButton from '../../components/LoaderButton';
-
-import { useFormFields } from '../../libs/hooksLib';
+import React, { useState } from "react";
+import { Auth } from "aws-amplify";
+import {
+  HelpBlock,
+  FormGroup,
+  FormControl,
+  ControlLabel
+} from "react-bootstrap";
+import LoaderButton from "../components/LoaderButton";
+import { useFormFields } from "../libs/hooksLib";
+import "./Signup.css";
 
 export default function Signup(props) {
   const [fields, handleFieldChange] = useFormFields({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    confirmationCode: ''
+    email: "",
+    password: "",
+    confirmPassword: "",
+    confirmationCode: ""
   });
   const [newUser, setNewUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +60,7 @@ export default function Signup(props) {
       await Auth.signIn(fields.email, fields.password);
 
       props.userHasAuthenticated(true);
-      props.history.push('/');
+      props.history.push("/");
     } catch (e) {
       alert(e.message);
       setIsLoading(false);
@@ -66,26 +70,22 @@ export default function Signup(props) {
   function renderConfirmationForm() {
     return (
       <form onSubmit={handleConfirmationSubmit}>
-        <TextField
-          id="confirmationCode"
-          label="Confirmation code"
-          margin="normal"
-          name="confirmationCode"
-          type="tel"
-          variant="outlined"
-          onChange={handleFieldChange}
-          value={fields.confirmationCode}
-          helperText="Please check your email for the code."
-          autoFocus
-          fullWidth
-        />
+        <FormGroup controlId="confirmationCode" bsSize="large">
+          <ControlLabel>Confirmation Code</ControlLabel>
+          <FormControl
+            autoFocus
+            type="tel"
+            onChange={handleFieldChange}
+            value={fields.confirmationCode}
+          />
+          <HelpBlock>Please check your email for the code.</HelpBlock>
+        </FormGroup>
         <LoaderButton
+          block
           type="submit"
-          variant="contained"
-          color="primary"
+          bsSize="large"
           isLoading={isLoading}
           disabled={!validateConfirmationForm()}
-          fullWidth
         >
           Verify
         </LoaderButton>
@@ -96,46 +96,37 @@ export default function Signup(props) {
   function renderForm() {
     return (
       <form onSubmit={handleSubmit}>
-        <TextField
-          id="email"
-          label="Email"
-          margin="normal"
-          name="email"
-          type="email"
-          variant="outlined"
-          value={fields.email}
-          onChange={handleFieldChange}
-          fullWidth
-        />
-        <TextField
-          id="password"
-          label="Password"
-          margin="normal"
-          name="password"
-          type="password"
-          variant="outlined"
-          value={fields.password}
-          onChange={handleFieldChange}
-          fullWidth
-        />
-        <TextField
-          id="confirmPassword"
-          label="Confirm password"
-          margin="normal"
-          name="confirmPassword"
-          type="password"
-          variant="outlined"
-          onChange={handleFieldChange}
-          value={fields.confirmPassword}
-          fullWidth
-        />
+        <FormGroup controlId="email" bsSize="large">
+          <ControlLabel>Email</ControlLabel>
+          <FormControl
+            autoFocus
+            type="email"
+            value={fields.email}
+            onChange={handleFieldChange}
+          />
+        </FormGroup>
+        <FormGroup controlId="password" bsSize="large">
+          <ControlLabel>Password</ControlLabel>
+          <FormControl
+            type="password"
+            value={fields.password}
+            onChange={handleFieldChange}
+          />
+        </FormGroup>
+        <FormGroup controlId="confirmPassword" bsSize="large">
+          <ControlLabel>Confirm Password</ControlLabel>
+          <FormControl
+            type="password"
+            onChange={handleFieldChange}
+            value={fields.confirmPassword}
+          />
+        </FormGroup>
         <LoaderButton
+          block
           type="submit"
-          variant="contained"
-          color="primary"
+          bsSize="large"
           isLoading={isLoading}
           disabled={!validateForm()}
-          fullWidth
         >
           Signup
         </LoaderButton>
@@ -144,8 +135,8 @@ export default function Signup(props) {
   }
 
   return (
-    <Container maxWidth="sm">
+    <div className="Signup">
       {newUser === null ? renderForm() : renderConfirmationForm()}
-    </Container>
+    </div>
   );
 }
