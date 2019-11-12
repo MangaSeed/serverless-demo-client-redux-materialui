@@ -52,7 +52,7 @@ const NewNote: FC<RouteComponentProps> = props => {
     }
   }
 
-  const createNote = (note: { content: string; attachment: string }) =>
+  const createNote = (note: { content: string; attachment: string | null }) =>
     API.post('notes', '/notes', {
       body: note
     });
