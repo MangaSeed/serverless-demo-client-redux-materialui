@@ -8,7 +8,7 @@ import {
   ICreateNotePayload,
   creatingNoteAction,
   createNoteErrorAction,
-  createdNoteAction
+  createdNoteAction,
 } from '../reducers/note';
 
 export const noteSagas = [fork(createNoteSaga)];
