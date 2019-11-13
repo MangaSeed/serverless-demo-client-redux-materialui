@@ -4,28 +4,28 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { addNote } from '../../services/note';
 
 import {
-  CREATE_TASK,
+  CREATE_NOTE,
   ICreateNotePayload,
-  creatingTaskAction,
-  createTaskErrorAction,
-  createdTaskAction
+  creatingNoteAction,
+  createNoteErrorAction,
+  createdNoteAction
 } from '../reducers/note';
 
 export const noteSagas = [fork(createNoteSaga)];
 
 function* createNoteSaga() {
-  yield takeLatest(CREATE_TASK, callCreateTaskSaga);
+  yield takeLatest(CREATE_NOTE, callCreateNoteSaga);
 }
 
-function* callCreateTaskSaga({ payload }: PayloadAction<ICreateNotePayload>) {
+function* callCreateNoteSaga({ payload }: PayloadAction<ICreateNotePayload>) {
   try {
-    yield put(creatingTaskAction());
+    yield put(creatingNoteAction());
 
     const { content, attachment } = payload;
     const created = yield call(addNote, content, attachment);
 
-    yield put(createdTaskAction(created));
+    yield put(createdNoteAction(created));
   } catch (err) {
-    yield put(createTaskErrorAction(err.message));
+    yield put(createNoteErrorAction(err.message));
   }
 }
