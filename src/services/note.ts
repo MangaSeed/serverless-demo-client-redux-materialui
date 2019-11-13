@@ -17,8 +17,8 @@ export const addNote = async (note: string, attachment?: File) => {
   const { data } = await API.post(ENDPOINT, '/notes', {
     body: {
       content: note,
-      attachment: fileKey
-    }
+      attachment: fileKey,
+    },
   });
 
   return data;
@@ -65,7 +65,7 @@ export const updateNote = async (
   }
 
   const { data } = await API.put(ENDPOINT, `/notes/${note.noteId}`, {
-    body: { ...note, attachment: fileKey }
+    body: { ...note, attachment: fileKey },
   });
 
   return data;
@@ -75,7 +75,7 @@ export const billNote = async (storage: number, source: string) => {
   return await API.post(ENDPOINT, `/billing`, {
     body: {
       storage,
-      source
-    }
+      source,
+    },
   });
 };
