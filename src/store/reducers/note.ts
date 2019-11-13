@@ -21,10 +21,21 @@ interface INoteState {
   create: INoteCreateState;
 }
 
-/** CONSTANTS */
-const SLICE_NAME = 'note';
+export interface ICreateNotePayload {
+  content: string;
+  attachment?: File;
+}
 
-export const CREATE_TASK = `${SLICE_NAME}/createTaskAction`;
+interface ICreateNoteAction {
+  payload: ICreateNotePayload;
+}
+
+/** NOTE ACTION TYPES */
+
+type CreateNoteActionType = (params: ICreateNotePayload) => ICreateNoteAction;
+
+/** NOTE CONSTANTS */
+export const CREATE_TASK = `note/createTaskAction`;
 
 const INIT_NOTE_CREATE_STATE: INoteCreateState = {
   creating: false,
@@ -37,9 +48,9 @@ const INIT_NOTE_STATE: INoteState = {
   create: INIT_NOTE_CREATE_STATE
 };
 
-/** SLICE CONFIG */
+/** NOTE SLICE CONFIG */
 const noteSlice = createSlice({
-  name: SLICE_NAME,
+  name: 'note',
   initialState: INIT_NOTE_STATE,
   reducers: {
     creatingTaskAction: state => {
@@ -59,20 +70,26 @@ const noteSlice = createSlice({
         ...INIT_NOTE_CREATE_STATE,
         error: payload
       };
+    },
+
+    clearTaskStateAction: (state, { payload }: PayloadAction<'create'>) => {
+      state[payload] = INIT_NOTE_STATE[payload];
     }
   }
 });
 
-/** ACTION CREATORS */
-export const createNoteAction = createAction<string, typeof CREATE_TASK>(
-  CREATE_TASK
-);
+/** NOTE ACTION CREATORS */
+export const createNoteAction = createAction<
+  CreateNoteActionType,
+  typeof CREATE_TASK
+>(CREATE_TASK, params => ({ payload: params }));
 
 export const {
   creatingTaskAction,
   createdTaskAction,
-  createTaskErrorAction
+  createTaskErrorAction,
+  clearTaskStateAction
 } = noteSlice.actions;
 
-/** REDUCER */
+/** NOTE REDUCER */
 export const { reducer: noteReducer } = noteSlice;
