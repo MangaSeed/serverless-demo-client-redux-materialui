@@ -1,23 +1,53 @@
-import React, { useRef, useState, FormEvent, ChangeEvent, FC } from 'react';
+import React, {
+  useRef,
+  useState,
+  FormEvent,
+  ChangeEvent,
+  FC,
+  useEffect
+} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import { Button, Container, TextField } from '@material-ui/core';
-import { API } from 'aws-amplify';
+
+import {
+  selectNoteCreating,
+  selectNoteCreateError,
+  selectNoteCreated
+} from '../../store/selector/note';
+
+import {
+  createNoteAction,
+  clearNoteStateAction
+} from '../../store/reducers/note';
 
 import LoaderButton from '../../components/LoaderButton';
-
-import { s3Upload } from '../../libs/awsLib';
 
 import config from '../../config';
 
 import { useNewNoteStyle } from './NewNote.style';
 
-const NewNote: FC<RouteComponentProps> = props => {
-  const file = useRef<File | null>(null);
+const NewNote: FC<RouteComponentProps> = ({ history }) => {
+  const { push: historyPush } = history;
+  const dispatch = useDispatch();
   const classes = useNewNoteStyle();
+  const file = useRef<File | null>(null);
+
+  const creatingNote = useSelector(selectNoteCreating);
+  const createNoteError = useSelector(selectNoteCreateError);
+  const createdNote = useSelector(selectNoteCreated);
 
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (createNoteError) alert(createNoteError);
+
+    if (createdNote) {
+      dispatch(clearNoteStateAction('create'));
+      historyPush('/');
+    }
+  }, [createNoteError, createdNote, historyPush, dispatch]);
 
   const validateForm = () => content.length > 0;
 
@@ -39,23 +69,10 @@ const NewNote: FC<RouteComponentProps> = props => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const attachment = file.current ? await s3Upload(file.current) : null;
-
-      await createNote({ content, attachment });
-      props.history.push('/');
-    } catch (e) {
-      alert(e);
-      setIsLoading(false);
-    }
+    dispatch(
+      createNoteAction({ content, attachment: file.current || undefined })
+    );
   }
-
-  const createNote = (note: { content: string; attachment: string | null }) =>
-    API.post('notes', '/notes', {
-      body: note
-    });
 
   return (
     <Container maxWidth="sm">
@@ -87,7 +104,7 @@ const NewNote: FC<RouteComponentProps> = props => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={isLoading}
+          isLoading={creatingNote}
           disabled={!validateForm()}
           fullWidth
         >
