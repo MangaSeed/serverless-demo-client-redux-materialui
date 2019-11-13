@@ -41,11 +41,11 @@ const INIT_NOTE_CREATE_STATE: INoteCreateState = {
   creating: false,
   created: false,
   error: '',
-  data: null
+  data: null,
 };
 
 const INIT_NOTE_STATE: INoteState = {
-  create: INIT_NOTE_CREATE_STATE
+  create: INIT_NOTE_CREATE_STATE,
 };
 
 /** NOTE SLICE CONFIG */
@@ -61,21 +61,21 @@ const noteSlice = createSlice({
       state.create = {
         ...INIT_NOTE_CREATE_STATE,
         created: true,
-        data: payload
+        data: payload,
       };
     },
 
     createNoteErrorAction: (state, { payload }: PayloadAction<string>) => {
       state.create = {
         ...INIT_NOTE_CREATE_STATE,
-        error: payload
+        error: payload,
       };
     },
 
     clearNoteStateAction: (state, { payload }: PayloadAction<'create'>) => {
       state[payload] = INIT_NOTE_STATE[payload];
-    }
-  }
+    },
+  },
 });
 
 /** NOTE ACTION CREATORS */
@@ -88,7 +88,7 @@ export const {
   creatingNoteAction,
   createdNoteAction,
   createNoteErrorAction,
-  clearNoteStateAction
+  clearNoteStateAction,
 } = noteSlice.actions;
 
 /** NOTE REDUCER */
