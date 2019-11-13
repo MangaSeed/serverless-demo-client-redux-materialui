@@ -6,7 +6,7 @@ import { INotes } from '../containers/Note/Notes';
 
 const ENDPOINT = 'notes';
 
-export const addNote = async (note: string, attachment?: File) => {
+export const addNote = async (content: string, attachment?: File) => {
   let fileKey: string | undefined;
 
   if (attachment) {
@@ -16,7 +16,7 @@ export const addNote = async (note: string, attachment?: File) => {
 
   return await API.post(ENDPOINT, '/notes', {
     body: {
-      content: note,
+      content,
       attachment: fileKey
     }
   });
