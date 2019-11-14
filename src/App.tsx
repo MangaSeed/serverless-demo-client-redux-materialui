@@ -1,52 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RouterProps } from 'react-router';
 import { NavLink, withRouter } from 'react-router-dom';
 import { CssBaseline, Button, Container } from '@material-ui/core';
-import { Auth } from 'aws-amplify';
+
+import {
+  checkAuthAction,
+  signOutAuthAction,
+  resetAuthInnerStateAction
+} from './store/reducers/auth';
+
+import {
+  selectAuthChecking,
+  selectAuthChecked,
+  selectAuthSignedOut
+} from './store/selectors/auth';
 
 import Routes from './Routes';
 
 import Navigation from './components/Navigation/Navigation';
 
-/**
- * !IMPORTANT - I'm just enforcing material ui to work. I'm not changing any logic behind this boilerplate @vincent.
- */
-function App(props: RouterProps) {
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
-  const [isAuthenticated, userHasAuthenticated] = useState(false);
+function App({ history }: RouterProps) {
+  const { push: historyPush } = history;
+  const dispatch = useDispatch();
+
+  const checkingAuth = useSelector(selectAuthChecking);
+  const checkedAuth = useSelector(selectAuthChecked);
+
+  const signedOut = useSelector(selectAuthSignedOut);
 
   useEffect(() => {
-    onLoad();
-  }, []);
+    dispatch(checkAuthAction());
+  }, [dispatch]);
 
-  async function onLoad() {
-    try {
-      await Auth.currentSession();
-      userHasAuthenticated(true);
-    } catch (e) {
-      if (e !== 'No current user') {
-        alert(e);
-      }
+  useEffect(() => {
+    if (signedOut) {
+      dispatch(resetAuthInnerStateAction('check'));
+      historyPush('/signin');
     }
+  }, [signedOut, historyPush, dispatch]);
 
-    setIsAuthenticating(false);
+  function handleLogout() {
+    dispatch(signOutAuthAction());
   }
 
-  async function handleLogout() {
-    await Auth.signOut();
-
-    userHasAuthenticated(false);
-
-    props.history.push('/login');
-  }
-
-  if (isAuthenticating) return null;
+  if (checkingAuth) return null;
 
   return (
     <>
       <CssBaseline />
       <Navigation>
-        {isAuthenticated ? (
+        {checkedAuth ? (
           <>
             <Button color="inherit" component={NavLink} to="/settings">
               Settings
@@ -57,8 +61,8 @@ function App(props: RouterProps) {
           </>
         ) : (
           <>
-            <Button color="inherit" component={NavLink} to="/login">
-              Log in
+            <Button color="inherit" component={NavLink} to="/signin">
+              Sign in
             </Button>
             <Button color="inherit" component={NavLink} to="/signup">
               Sign up
@@ -67,7 +71,7 @@ function App(props: RouterProps) {
         )}
       </Navigation>
       <Container>
-        <Routes appProps={{ isAuthenticated, userHasAuthenticated }} />
+        <Routes appProps={{ checkedAuth }} />
       </Container>
     </>
   );
