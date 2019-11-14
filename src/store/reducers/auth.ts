@@ -7,6 +7,12 @@ interface IAuthActivateState {
   error: string;
 }
 
+interface IAuthCheckState {
+  checking: boolean;
+  checked: boolean;
+  error: string;
+}
+
 interface IAuthSignInState {
   signedIn: boolean;
   signingIn: boolean;
@@ -27,6 +33,7 @@ interface IAuthSignUpState {
 
 interface IAuthState {
   activate: IAuthActivateState;
+  check: IAuthCheckState;
   signin: IAuthSignInState;
   signout: IAuthSignOutState;
   signup: IAuthSignUpState;
@@ -34,6 +41,7 @@ interface IAuthState {
 
 /** AUTH ACTION TYPES */
 export const ACTIVATE_AUTH = 'auth/activateAuthAction';
+export const CHECK_AUTH = 'auth/checkAuthAction';
 export const SIGNIN_AUTH = 'auth/signInAuthAction';
 export const SIGNOUT_AUTH = 'auth/signOutAuthAction';
 export const SIGNUP_AUTH = 'auth/signUpAuthAction';
@@ -63,8 +71,15 @@ const INIT_AUTH_SIGNUP_STATE: IAuthSignUpState = {
   error: ''
 };
 
+const INIT_AUTH_CHECK_STATE: IAuthCheckState = {
+  checking: false,
+  checked: false,
+  error: ''
+};
+
 const INIT_AUTH_STATE: IAuthState = {
   activate: INIT_AUTH_ACTIVATE_STATE,
+  check: INIT_AUTH_CHECK_STATE,
   signin: INIT_AUTH_SIGNIN_STATE,
   signout: INIT_AUTH_SIGNOUT_STATE,
   signup: INIT_AUTH_SIGNUP_STATE
@@ -85,6 +100,18 @@ const authSlice = createSlice({
 
     activateErrorAuthAction: (state, { payload }: PayloadAction<string>) => {
       state.activate = { ...INIT_AUTH_ACTIVATE_STATE, error: payload };
+    },
+
+    checkingAuthAction: state => {
+      state.check = { ...INIT_AUTH_CHECK_STATE, checking: true };
+    },
+
+    checkedAuthAction: (state, { payload }: PayloadAction<boolean>) => {
+      state.check = { ...INIT_AUTH_CHECK_STATE, checked: payload };
+    },
+
+    checkErrorAuthAction: (state, { payload }: PayloadAction<string>) => {
+      state.check = { ...INIT_AUTH_CHECK_STATE, error: payload };
     },
 
     signingInAuthAction: state => {
@@ -125,7 +152,9 @@ const authSlice = createSlice({
 
     resetAuthInnerStateAction: (
       state,
-      { payload }: PayloadAction<'activate' | 'signin' | 'signout' | 'signup'>
+      {
+        payload
+      }: PayloadAction<'activate' | 'signin' | 'signout' | 'signup' | 'check'>
     ) => {
       // !IMPORTANT: tried this, weirdly enough typescript is not permitting it
       // state[payload] = INIT_AUTH_STATE[payload];
@@ -147,6 +176,10 @@ const authSlice = createSlice({
           state[payload] = INIT_AUTH_STATE[payload];
           break;
 
+        case 'check':
+          state[payload] = INIT_AUTH_STATE[payload];
+          break;
+
         default:
           state = INIT_AUTH_STATE;
           break;
@@ -161,6 +194,8 @@ export const activateAuthAction = createAction(
   (email: string, code: string) => ({ payload: { email, code } })
 );
 
+export const checkAuthAction = createAction(CHECK_AUTH);
+
 export const signInAuthAction = createAction(
   SIGNIN_AUTH,
   (email: string, password: string) => ({
@@ -170,7 +205,7 @@ export const signInAuthAction = createAction(
 
 export const signOutAuthAction = createAction(SIGNOUT_AUTH);
 
-export const signUnAuthAction = createAction(
+export const signUpAuthAction = createAction(
   SIGNUP_AUTH,
   (email: string, password: string) => ({
     payload: { email, password }
@@ -181,6 +216,9 @@ export const {
   activatingAuthAction,
   activatedAuthAction,
   activateErrorAuthAction,
+  checkingAuthAction,
+  checkedAuthAction,
+  checkErrorAuthAction,
   signingInAuthAction,
   signedInAuthAction,
   signInErrorAuthAction,
