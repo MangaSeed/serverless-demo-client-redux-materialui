@@ -1,36 +1,51 @@
-import React, { useState, FormEvent, FC } from 'react';
-import { Auth } from 'aws-amplify';
+import React, { FormEvent, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { TextField, Container } from '@material-ui/core';
 
-import { IAppProps } from '../../Routes';
+import {
+  signInAuthAction,
+  resetAuthInnerStateAction,
+  checkedAuthAction
+} from '../../store/reducers/auth';
+
+import {
+  selectAuthSigningIn,
+  selectAuthSignedIn,
+  selectAuthSignInError
+} from '../../store/selectors/auth';
 
 import LoaderButton from '../../components/LoaderButton';
 
 import { useFormFields } from '../../libs/hooksLib';
 
-const Login: FC<IAppProps> = props => {
-  const [isLoading, setIsLoading] = useState(false);
+const Signin = () => {
+  const dispatch = useDispatch();
+
+  const signingIn = useSelector(selectAuthSigningIn);
+  const signedIn = useSelector(selectAuthSignedIn);
+  const signInError = useSelector(selectAuthSignInError);
+
   const [fields, handleFieldChange] = useFormFields({
     email: '',
     password: ''
   });
 
+  useEffect(() => {
+    if (signInError) alert(signInError);
+
+    if (signedIn) {
+      dispatch(checkedAuthAction(true));
+      dispatch(resetAuthInnerStateAction('signin'));
+    }
+  }, [signInError, signedIn, dispatch]);
+
   const validateForm = () => {
     return fields.email.length > 0 && fields.password.length > 0;
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      await Auth.signIn(fields.email, fields.password);
-      props.userHasAuthenticated(true);
-    } catch (e) {
-      alert(e.message);
-      setIsLoading(false);
-    }
+    dispatch(signInAuthAction(fields.email, fields.password));
   };
 
   return (
@@ -62,15 +77,15 @@ const Login: FC<IAppProps> = props => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={isLoading}
+          isLoading={signingIn}
           disabled={!validateForm()}
           fullWidth
         >
-          Login
+          Sign in
         </LoaderButton>
       </form>
     </Container>
   );
 };
 
-export default Login;
+export default Signin;
