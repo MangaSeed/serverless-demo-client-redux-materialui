@@ -7,15 +7,15 @@ interface IAuthActivateState {
   error: string;
 }
 
-interface IAuthLoginState {
-  loggedIn: boolean;
-  loggingIn: boolean;
+interface IAuthSignInState {
+  signedIn: boolean;
+  signingIn: boolean;
   error: string;
 }
 
-interface IAuthLogoutState {
-  loggedOut: boolean;
-  loggingOut: boolean;
+interface IAuthSignOutState {
+  signedOut: boolean;
+  signingOut: boolean;
   error: string;
 }
 
@@ -27,15 +27,15 @@ interface IAuthSignUpState {
 
 interface IAuthState {
   activate: IAuthActivateState;
-  login: IAuthLoginState;
-  logout: IAuthLogoutState;
+  signin: IAuthSignInState;
+  signout: IAuthSignOutState;
   signup: IAuthSignUpState;
 }
 
 /** AUTH ACTION TYPES */
 export const ACTIVATE_AUTH = 'auth/activateAuthAction';
-export const LOGIN_AUTH = 'auth/logInAuthAction';
-export const LOGOUT_AUTH = 'auth/logOutAuthAction';
+export const SIGNIN_AUTH = 'auth/signInAuthAction';
+export const SIGNOUT_AUTH = 'auth/signOutAuthAction';
 export const SIGNUP_AUTH = 'auth/signUpAuthAction';
 
 /** AUTH INITIAL STATES */
@@ -45,15 +45,15 @@ const INIT_AUTH_ACTIVATE_STATE: IAuthActivateState = {
   error: ''
 };
 
-const INIT_AUTH_LOGIN_STATE: IAuthLoginState = {
-  loggedIn: false,
-  loggingIn: false,
+const INIT_AUTH_SIGNIN_STATE: IAuthSignInState = {
+  signedIn: false,
+  signingIn: false,
   error: ''
 };
 
-const INIT_AUTH_LOGOUT_STATE: IAuthLogoutState = {
-  loggedOut: false,
-  loggingOut: false,
+const INIT_AUTH_SIGNOUT_STATE: IAuthSignOutState = {
+  signedOut: false,
+  signingOut: false,
   error: ''
 };
 
@@ -65,8 +65,8 @@ const INIT_AUTH_SIGNUP_STATE: IAuthSignUpState = {
 
 const INIT_AUTH_STATE: IAuthState = {
   activate: INIT_AUTH_ACTIVATE_STATE,
-  login: INIT_AUTH_LOGIN_STATE,
-  logout: INIT_AUTH_LOGOUT_STATE,
+  signin: INIT_AUTH_SIGNIN_STATE,
+  signout: INIT_AUTH_SIGNOUT_STATE,
   signup: INIT_AUTH_SIGNUP_STATE
 };
 
@@ -87,28 +87,28 @@ const authSlice = createSlice({
       state.activate = { ...INIT_AUTH_ACTIVATE_STATE, error: payload };
     },
 
-    loggingInAuthAction: state => {
-      state.login = { ...INIT_AUTH_LOGIN_STATE, loggingIn: true };
+    signingInAuthAction: state => {
+      state.signin = { ...INIT_AUTH_SIGNIN_STATE, signingIn: true };
     },
 
-    loggedInAuthAction: state => {
-      state.login = { ...INIT_AUTH_LOGIN_STATE, loggedIn: true };
+    signedInAuthAction: state => {
+      state.signin = { ...INIT_AUTH_SIGNIN_STATE, signedIn: true };
     },
 
-    logInErrorAuthAction: (state, { payload }: PayloadAction<string>) => {
-      state.login = { ...INIT_AUTH_LOGIN_STATE, error: payload };
+    signInErrorAuthAction: (state, { payload }: PayloadAction<string>) => {
+      state.signin = { ...INIT_AUTH_SIGNIN_STATE, error: payload };
     },
 
-    loggingOutAuthAction: state => {
-      state.logout = { ...INIT_AUTH_LOGOUT_STATE, loggingOut: true };
+    signingOutAuthAction: state => {
+      state.signout = { ...INIT_AUTH_SIGNOUT_STATE, signingOut: true };
     },
 
-    loggedOutAuthAction: state => {
-      state.logout = { ...INIT_AUTH_LOGOUT_STATE, loggedOut: true };
+    signedOutAuthAction: state => {
+      state.signout = { ...INIT_AUTH_SIGNOUT_STATE, signedOut: true };
     },
 
-    logOutErrorAuthAction: (state, { payload }: PayloadAction<string>) => {
-      state.logout = { ...INIT_AUTH_LOGOUT_STATE, error: payload };
+    signOutErrorAuthAction: (state, { payload }: PayloadAction<string>) => {
+      state.signout = { ...INIT_AUTH_SIGNOUT_STATE, error: payload };
     },
 
     signingUpAuthAction: state => {
@@ -125,7 +125,7 @@ const authSlice = createSlice({
 
     resetAuthInnerStateAction: (
       state,
-      { payload }: PayloadAction<'activate' | 'login' | 'logout' | 'signup'>
+      { payload }: PayloadAction<'activate' | 'signin' | 'signout' | 'signup'>
     ) => {
       // !IMPORTANT: tried this, weirdly enough typescript is not permitting it
       // state[payload] = INIT_AUTH_STATE[payload];
@@ -135,11 +135,11 @@ const authSlice = createSlice({
           state[payload] = INIT_AUTH_STATE[payload];
           break;
 
-        case 'login':
+        case 'signin':
           state[payload] = INIT_AUTH_STATE[payload];
           break;
 
-        case 'logout':
+        case 'signout':
           state[payload] = INIT_AUTH_STATE[payload];
           break;
 
@@ -161,14 +161,14 @@ export const activateAuthAction = createAction(
   (email: string, code: string) => ({ payload: { email, code } })
 );
 
-export const logInAuthAction = createAction(
-  LOGIN_AUTH,
+export const signInAuthAction = createAction(
+  SIGNIN_AUTH,
   (email: string, password: string) => ({
     payload: { email, password }
   })
 );
 
-export const logOutAuthAction = createAction(LOGOUT_AUTH);
+export const signOutAuthAction = createAction(SIGNOUT_AUTH);
 
 export const signUnAuthAction = createAction(
   SIGNUP_AUTH,
@@ -181,12 +181,12 @@ export const {
   activatingAuthAction,
   activatedAuthAction,
   activateErrorAuthAction,
-  loggingInAuthAction,
-  loggedInAuthAction,
-  logInErrorAuthAction,
-  loggingOutAuthAction,
-  loggedOutAuthAction,
-  logOutErrorAuthAction,
+  signingInAuthAction,
+  signedInAuthAction,
+  signInErrorAuthAction,
+  signingOutAuthAction,
+  signedOutAuthAction,
+  signOutErrorAuthAction,
   signingUpAuthAction,
   signedUpAuthAction,
   signUpErrorAuthAction,
