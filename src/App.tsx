@@ -40,9 +40,9 @@ function App({ history }: RouterProps) {
     }
   }, [signedOut, historyPush, dispatch]);
 
-  function handleLogout() {
+  const handleLogout = () => {
     dispatch(signOutAuthAction());
-  }
+  };
 
   if (checkingAuth) return null;
 
@@ -55,13 +55,18 @@ function App({ history }: RouterProps) {
             <Button color="inherit" component={NavLink} to="/settings">
               Settings
             </Button>
-            <Button color="inherit" onClick={handleLogout}>
-              Logout
+            <Button color="inherit" onClick={handleLogout} id="sign-out-button">
+              Sign out
             </Button>
           </>
         ) : (
           <>
-            <Button color="inherit" component={NavLink} to="/signin">
+            <Button
+              color="inherit"
+              component={NavLink}
+              to="/signin"
+              id="signin-nav"
+            >
               Sign in
             </Button>
             <Button color="inherit" component={NavLink} to="/signup">

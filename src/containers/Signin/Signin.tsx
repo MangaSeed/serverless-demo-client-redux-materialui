@@ -79,6 +79,7 @@ const Signin = () => {
           color="primary"
           isLoading={signingIn}
           disabled={!validateForm()}
+          id="signin-button"
           fullWidth
         >
           Sign in
