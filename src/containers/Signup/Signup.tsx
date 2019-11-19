@@ -106,7 +106,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
     return (
       <form onSubmit={handleConfirmationSubmit}>
         <TextField
-          id="confirmationCode"
+          id="confirmation-code"
           label="Confirmation code"
           margin="normal"
           name="confirmationCode"
@@ -125,6 +125,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
           isLoading={activating || signingIn}
           disabled={!validateConfirmationForm()}
           fullWidth
+          id="verify-button"
         >
           Verify
         </LoaderButton>
@@ -158,7 +159,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
           fullWidth
         />
         <TextField
-          id="confirmPassword"
+          id="confirm-password"
           label="Confirm password"
           margin="normal"
           name="confirmPassword"
@@ -174,6 +175,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
           color="primary"
           isLoading={signingUp}
           disabled={!validateForm()}
+          id="signup-button"
           fullWidth
         >
           Signup
