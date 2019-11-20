@@ -9,19 +9,20 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import {
+  Box,
   Button,
+  CircularProgress,
   Container,
   Grid,
   TextField,
   Typography,
 } from '@material-ui/core';
-import { API, Storage } from 'aws-amplify';
 
 import {
   removeNoteAction,
-  INote,
   updateNoteAction,
   clearNoteStateAction,
+  fetchNoteAction,
 } from '../../store/reducers/note';
 
 import {
@@ -31,6 +32,10 @@ import {
   selectNoteUpdating,
   selectNoteUpdated,
   selectNoteUpdateError,
+  selectNoteFetched,
+  selectNoteFetchData,
+  selectNoteFetching,
+  selectNoteFetchError,
 } from '../../store/selector/note';
 
 import LoaderButton from '../../components/LoaderButton';
@@ -54,31 +59,21 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   const updated = useSelector(selectNoteUpdated);
   const updateError = useSelector(selectNoteUpdateError);
 
-  const [note, setNote] = useState<INote | null>(null);
+  const fetching = useSelector(selectNoteFetching);
+  const fetched = useSelector(selectNoteFetched);
+  const fetchError = useSelector(selectNoteFetchError);
+  const note = useSelector(selectNoteFetchData);
+
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    const loadNote = () => API.get('notes', `/notes/${match.params.id}`, null);
+    dispatch(fetchNoteAction(match.params.id));
+  }, [match.params.id, dispatch]);
 
-    const onLoad = async () => {
-      try {
-        const note = await loadNote();
-        const { content, attachment } = note;
-
-        if (attachment) {
-          note.attachmentURL = await Storage.vault.get(attachment);
-        }
-
-        setContent(content);
-        setNote(note);
-      } catch (e) {
-        alert(e);
-      }
-    };
-
-    onLoad();
-  }, [match.params.id]);
+  useEffect(() => {
+    if (fetched && note && note.content) setContent(note.content);
+  }, [note, fetched]);
 
   useEffect(() => {
     if (removed) dispatch(clearNoteStateAction('remove'));
@@ -89,7 +84,11 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   useEffect(() => {
     if (removeError) alert(removeError);
     if (updateError) alert(updateError);
-  }, [removeError, updateError]);
+    if (fetchError) {
+      alert(fetchError);
+      historyPush('/');
+    }
+  }, [removeError, updateError, fetchError, historyPush]);
 
   const validateForm = () => content.length > 0;
   const formatFilename = (str: string) => str.replace(/^\w+-/, '');
@@ -128,8 +127,14 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   };
 
   return (
-    note && (
-      <Container maxWidth="md">
+    <Container maxWidth="md">
+      {!note && fetching ? (
+        <Grid container justify="center">
+          <Box p={10}>
+            <CircularProgress />
+          </Box>
+        </Grid>
+      ) : (
         <form className={classes.notesForm} onSubmit={handleSubmit}>
           <TextField
             label="Note"
@@ -143,7 +148,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
           <Typography variant="h5" gutterBottom>
             Attachment
           </Typography>
-          {note.attachment && (
+          {note && note.attachment && (
             <Typography variant="h6">
               <a
                 target="_blank"
@@ -196,8 +201,8 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
             </Grid>
           </Grid>
         </form>
-      </Container>
-    )
+      )}
+    </Container>
   );
 };
 
