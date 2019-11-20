@@ -6,6 +6,7 @@ import React, {
   ChangeEvent,
   FormEvent,
 } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import {
   Button,
@@ -16,29 +17,27 @@ import {
 } from '@material-ui/core';
 import { API, Storage } from 'aws-amplify';
 
-import LoaderButton from '../../components/LoaderButton';
+import {
+  removeNoteAction,
+  INote,
+  updateNoteAction,
+  clearNoteStateAction,
+} from '../../store/reducers/note';
 
-import { s3Upload } from '../../libs/awsLib';
-
-import config from '../../config';
-
-import { useNotesStyle } from './Notes.style';
-import { useDispatch, useSelector } from 'react-redux';
-import { removeNoteAction } from '../../store/reducers/note';
 import {
   selectNoteRemoving,
   selectNoteRemoved,
   selectNoteRemoveError,
+  selectNoteUpdating,
+  selectNoteUpdated,
+  selectNoteUpdateError,
 } from '../../store/selector/note';
 
-export interface INotes {
-  useId: string;
-  noteId: string;
-  content: string;
-  createdAt: number;
-  attachment?: string;
-  attachmentURL?: string;
-}
+import LoaderButton from '../../components/LoaderButton';
+
+import config from '../../config';
+
+import { useNotesStyle } from './Notes.style';
 
 const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   const { push: historyPush } = history;
@@ -51,10 +50,13 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   const removed = useSelector(selectNoteRemoved);
   const removeError = useSelector(selectNoteRemoveError);
 
-  const [note, setNote] = useState<INotes | null>(null);
+  const updating = useSelector(selectNoteUpdating);
+  const updated = useSelector(selectNoteUpdated);
+  const updateError = useSelector(selectNoteUpdateError);
+
+  const [note, setNote] = useState<INote | null>(null);
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadNote = () => API.get('notes', `/notes/${match.params.id}`, null);
@@ -79,12 +81,15 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   }, [match.params.id]);
 
   useEffect(() => {
-    if (removed) historyPush('/');
-  }, [removed, historyPush]);
+    if (removed) dispatch(clearNoteStateAction('remove'));
+    if (updated) dispatch(clearNoteStateAction('update'));
+    if (updated || removed) historyPush('/');
+  }, [removed, updated, dispatch, historyPush]);
 
   useEffect(() => {
     if (removeError) alert(removeError);
-  }, [removeError]);
+    if (updateError) alert(updateError);
+  }, [removeError, updateError]);
 
   const validateForm = () => content.length > 0;
   const formatFilename = (str: string) => str.replace(/^\w+-/, '');
@@ -95,18 +100,11 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
     setFileName(file.current.name);
   };
 
-  const saveNote = (note: { content: string; attachment?: string }) =>
-    API.put('notes', `/notes/${match.params.id}`, {
-      body: note,
-    });
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let attachment;
-
     if (!note) return;
-
+    if (!content) return;
     if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
       alert(
         `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
@@ -115,22 +113,9 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
       return;
     }
 
-    setIsLoading(true);
+    const newNote = { ...note, content };
 
-    try {
-      if (file.current) {
-        attachment = await s3Upload(file.current);
-      }
-
-      await saveNote({
-        content,
-        attachment: attachment || note.attachment,
-      });
-      historyPush('/');
-    } catch (e) {
-      alert(e);
-      setIsLoading(false);
-    }
+    dispatch(updateNoteAction({ note: newNote, attachment: file.current }));
   };
 
   const handleRemove = async () => {
@@ -202,7 +187,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
                 color="primary"
                 type="submit"
                 variant="contained"
-                isLoading={isLoading}
+                isLoading={updating}
                 disabled={!validateForm()}
                 fullWidth
               >
