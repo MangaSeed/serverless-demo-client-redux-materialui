@@ -22,7 +22,7 @@ export const addNote = async (note: string, attachment?: File) => {
   });
 };
 
-export const fetchNotes = async (): Promise<INote[]> => {
+export const fetchNoteList = async (): Promise<INote[]> => {
   return await API.get(ENDPOINT, '/notes', null);
 };
 
