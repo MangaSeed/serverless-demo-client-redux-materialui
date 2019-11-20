@@ -67,3 +67,26 @@ export const selectNoteUpdateData = createSelector(
   selectNoteUpdate,
   update => update.data
 );
+
+/** NOTE FETCH SELECTOR */
+export const selectNoteFetch = createSelector(selectNote, note => note.fetch);
+
+export const selectNoteFetching = createSelector(
+  selectNoteFetch,
+  fetch => fetch.fetching
+);
+
+export const selectNoteFetched = createSelector(
+  selectNoteFetch,
+  fetch => fetch.fetched
+);
+
+export const selectNoteFetchError = createSelector(
+  selectNoteFetch,
+  fetch => fetch.error
+);
+
+export const selectNoteFetchData = createSelector(
+  selectNoteFetch,
+  fetch => fetch.data
+);
