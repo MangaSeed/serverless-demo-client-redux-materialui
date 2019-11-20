@@ -90,3 +90,26 @@ export const selectNoteFetchData = createSelector(
   selectNoteFetch,
   fetch => fetch.data
 );
+
+/** NOTE LIST SELECTOR */
+export const selectNoteList = createSelector(selectNote, note => note.list);
+
+export const selectNoteListFetching = createSelector(
+  selectNoteList,
+  list => list.fetching
+);
+
+export const selectNoteListFetched = createSelector(
+  selectNoteList,
+  list => list.fetched
+);
+
+export const selectNoteListError = createSelector(
+  selectNoteList,
+  list => list.error
+);
+
+export const selectNoteListData = createSelector(
+  selectNoteList,
+  list => list.data
+);
