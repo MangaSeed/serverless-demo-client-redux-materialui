@@ -4,6 +4,7 @@ import { AppState } from '../reducers';
 
 export const selectNote = (state: AppState) => state.note;
 
+/** NOTE CREATE SELECTOR */
 export const selectNoteCreate = createSelector(selectNote, note => note.create);
 
 export const selectNoteCreating = createSelector(
@@ -26,6 +27,7 @@ export const selectNoteCreateData = createSelector(
   create => create.data
 );
 
+/** NOTE REMOVE SELECTOR */
 export const selectNoteRemove = createSelector(selectNote, note => note.remove);
 
 export const selectNoteRemoving = createSelector(
@@ -41,4 +43,27 @@ export const selectNoteRemoved = createSelector(
 export const selectNoteRemoveError = createSelector(
   selectNoteRemove,
   remove => remove.error
+);
+
+/** NOTE UPDATE SELECTOR */
+export const selectNoteUpdate = createSelector(selectNote, note => note.update);
+
+export const selectNoteUpdating = createSelector(
+  selectNoteUpdate,
+  update => update.updating
+);
+
+export const selectNoteUpdated = createSelector(
+  selectNoteUpdate,
+  update => update.updated
+);
+
+export const selectNoteUpdateError = createSelector(
+  selectNoteUpdate,
+  update => update.error
+);
+
+export const selectNoteUpdateData = createSelector(
+  selectNoteUpdate,
+  update => update.data
 );
