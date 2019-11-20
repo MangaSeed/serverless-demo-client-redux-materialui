@@ -4,17 +4,21 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import {
   addNote,
   deleteNote,
-  updateNote,
   fetchNote,
+  fetchNoteList,
+  updateNote,
 } from '../../services/note';
 
 import {
   INote,
   CREATE_NOTE,
+  FETCH_NOTE,
+  FETCH_NOTE_LIST,
   REMOVE_NOTE,
   UPDATE_NOTE,
   ICreateNotePayload,
   IRemoveNotePayload,
+  IUpdateNotePayload,
   creatingNoteAction,
   createNoteErrorAction,
   createdNoteAction,
@@ -24,17 +28,19 @@ import {
   updateNoteErrorAction,
   updatingNoteAction,
   updatedNoteAction,
-  IUpdateNotePayload,
-  FETCH_NOTE,
   fetchNoteErrorAction,
   fetchingNoteAction,
   fetchedNoteAction,
+  fetchNoteListErrorAction,
+  fetchingNoteListAction,
+  fetchedNoteListAction,
 } from '../reducers/note';
 
 export const noteSagas = [
   fork(createNoteSaga),
-  fork(fetchNoteSaga),
   fork(deletedNoteSaga),
+  fork(fetchNoteListSaga),
+  fork(fetchNoteSaga),
   fork(updateNoteSaga),
 ];
 
@@ -96,5 +102,19 @@ function* callFetchNoteSaga({ payload }: PayloadAction<string>) {
     yield put(fetchedNoteAction(fetched));
   } catch (err) {
     yield put(fetchNoteErrorAction(err.message));
+  }
+}
+
+function* fetchNoteListSaga() {
+  yield takeLatest(FETCH_NOTE_LIST, callFetchNoteListSaga);
+}
+
+function* callFetchNoteListSaga() {
+  try {
+    yield put(fetchingNoteListAction());
+    const list: INote[] = yield call(fetchNoteList);
+    yield put(fetchedNoteListAction(list));
+  } catch (err) {
+    yield put(fetchNoteListErrorAction(err.message));
   }
 }
