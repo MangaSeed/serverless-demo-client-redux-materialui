@@ -2,7 +2,7 @@ import { API } from 'aws-amplify';
 
 import { fileUpload, fileGet, fileDelete } from './file';
 
-import { INotes } from '../containers/Note/Notes';
+import { INote } from '../store/reducers/note';
 
 const ENDPOINT = 'notes';
 
@@ -17,17 +17,17 @@ export const addNote = async (note: string, attachment?: File) => {
   return await API.post(ENDPOINT, '/notes', {
     body: {
       content: note,
-      attachment: fileKey
-    }
+      attachment: fileKey,
+    },
   });
 };
 
-export const fetchNotes = async (): Promise<INotes[]> => {
+export const fetchNotes = async (): Promise<INote[]> => {
   return await API.get(ENDPOINT, '/notes', null);
 };
 
-export const fetchNote = async (id: string): Promise<INotes> => {
-  const data: INotes = await API.get(ENDPOINT, `/notes/${id}`, null);
+export const fetchNote = async (id: string): Promise<INote> => {
+  const data: INote = await API.get(ENDPOINT, `/notes/${id}`, null);
 
   if (data.attachment) {
     const fileAttachment = await fileGet(data.attachment);
@@ -46,9 +46,9 @@ export const deleteNote = async (id: string, fileName?: string) => {
 };
 
 export const updateNote = async (
-  note: INotes,
-  attachment?: File
-): Promise<INotes> => {
+  note: INote,
+  attachment?: File | null
+): Promise<INote> => {
   let fileKey = note.attachment;
 
   if (attachment) {
@@ -58,7 +58,7 @@ export const updateNote = async (
   }
 
   return await API.put(ENDPOINT, `/notes/${note.noteId}`, {
-    body: { ...note, attachment: fileKey }
+    body: { ...note, attachment: fileKey },
   });
 };
 
@@ -66,7 +66,7 @@ export const billNote = async (storage: number, source: string) => {
   return await API.post(ENDPOINT, `/billing`, {
     body: {
       storage,
-      source
-    }
+      source,
+    },
   });
 };

@@ -6,12 +6,12 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Box
+  Box,
 } from '@material-ui/core';
 import { NoteAdd as NoteAddIcon } from '@material-ui/icons';
 import { API } from 'aws-amplify';
 
-import { INotes } from '../Note/Notes';
+import { INote } from '../../store/reducers/note';
 
 import { IAppProps } from '../../Routes';
 
@@ -19,7 +19,7 @@ import { useHomeStyle } from './Home.style';
 
 const Home: FC<IAppProps> = props => {
   const classes = useHomeStyle();
-  const [notes, setNotes] = useState<INotes[]>([]);
+  const [notes, setNotes] = useState<INote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const Home: FC<IAppProps> = props => {
 
   const loadNotes = () => API.get('notes', '/notes', null);
 
-  const renderNotesList = (notes: INotes[]) => {
+  const renderNotesList = (notes: INote[]) => {
     return (
       <>
         <ListItem button component={Link} to="/notes/new">
