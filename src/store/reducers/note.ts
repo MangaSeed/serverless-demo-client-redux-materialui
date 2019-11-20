@@ -24,6 +24,13 @@ interface INoteFetchState {
   data: INote | null;
 }
 
+interface INoteListState {
+  fetching: boolean;
+  fetched: boolean;
+  error: string;
+  data: INote[];
+}
+
 interface INoteRemoveState {
   removing: boolean;
   removed: boolean;
@@ -40,6 +47,7 @@ interface INoteUpdateState {
 interface INoteState {
   create: INoteCreateState;
   fetch: INoteFetchState;
+  list: INoteListState;
   remove: INoteRemoveState;
   update: INoteUpdateState;
 }
@@ -72,7 +80,6 @@ interface IUpdateNoteAction {
 }
 
 /** NOTE ACTION TYPES */
-
 type CreateNoteActionType = (params: ICreateNotePayload) => ICreateNoteAction;
 type RemoveNoteActionType = (params: IRemoveNotePayload) => IRemoveNoteAction;
 type UpdateNoteActionType = (params: IUpdateNotePayload) => IUpdateNoteAction;
@@ -80,6 +87,7 @@ type UpdateNoteActionType = (params: IUpdateNotePayload) => IUpdateNoteAction;
 /** NOTE CONSTANTS */
 export const CREATE_NOTE = 'note/createNoteAction';
 export const FETCH_NOTE = 'note/fetchNoteAction';
+export const FETCH_NOTE_LIST = 'note/fetchNoteListAction';
 export const REMOVE_NOTE = 'note/removeNoteAction';
 export const UPDATE_NOTE = 'note/updateNoteAction';
 
@@ -95,6 +103,13 @@ const INIT_NOTE_FETCH_STATE: INoteFetchState = {
   fetched: false,
   error: '',
   data: null,
+};
+
+const INIT_NOTE_LIST_STATE: INoteListState = {
+  fetching: false,
+  fetched: false,
+  error: '',
+  data: [],
 };
 
 const INIT_NOTE_REMOVE_STATE: INoteRemoveState = {
@@ -113,6 +128,7 @@ const INIT_NOTE_UPDATE_STATE: INoteUpdateState = {
 const INIT_NOTE_STATE: INoteState = {
   create: INIT_NOTE_CREATE_STATE,
   fetch: INIT_NOTE_FETCH_STATE,
+  list: INIT_NOTE_LIST_STATE,
   remove: INIT_NOTE_REMOVE_STATE,
   update: INIT_NOTE_UPDATE_STATE,
 };
@@ -153,6 +169,18 @@ const noteSlice = createSlice({
       state.fetch = { ...INIT_NOTE_FETCH_STATE, error: payload };
     },
 
+    fetchingNoteListAction: state => {
+      state.list = { ...INIT_NOTE_LIST_STATE, fetching: true };
+    },
+
+    fetchedNoteListAction: (state, { payload }: PayloadAction<INote[]>) => {
+      state.list = { ...INIT_NOTE_LIST_STATE, fetched: true, data: payload };
+    },
+
+    fetchNoteListErrorAction: (state, { payload }: PayloadAction<string>) => {
+      state.list = { ...INIT_NOTE_LIST_STATE, error: payload };
+    },
+
     removingNoteAction: state => {
       state.remove = { ...INIT_NOTE_REMOVE_STATE, removing: true };
     },
@@ -183,7 +211,9 @@ const noteSlice = createSlice({
 
     clearNoteStateAction: (
       state,
-      { payload }: PayloadAction<'create' | 'remove' | 'update'>
+      {
+        payload,
+      }: PayloadAction<'create' | 'remove' | 'update' | 'fetch' | 'list'>
     ) => {
       (state[payload] as typeof state[typeof payload]) = INIT_NOTE_STATE[
         payload
@@ -202,6 +232,10 @@ export const fetchNoteAction = createAction<string, typeof FETCH_NOTE>(
   FETCH_NOTE
 );
 
+export const fetchNoteListAction = createAction<undefined, typeof FETCH_NOTE_LIST>(
+  FETCH_NOTE_LIST
+);
+
 export const removeNoteAction = createAction<
   RemoveNoteActionType,
   typeof REMOVE_NOTE
@@ -218,8 +252,11 @@ export const {
   createNoteErrorAction,
   creatingNoteAction,
   fetchedNoteAction,
+  fetchedNoteListAction,
   fetchingNoteAction,
+  fetchingNoteListAction,
   fetchNoteErrorAction,
+  fetchNoteListErrorAction,
   removedNoteAction,
   removeNoteErrorAction,
   removingNoteAction,
