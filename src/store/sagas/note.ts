@@ -16,7 +16,7 @@ import {
   removedNoteAction,
 } from '../reducers/note';
 
-export const noteSagas = [fork(createNoteSaga), fork(deletedNoteSaga)];
+export const noteSagas = [fork(createNoteSaga), fork(removeNoteSaga)];
 
 function* createNoteSaga() {
   yield takeLatest(CREATE_NOTE, callCreateNoteSaga);
@@ -35,11 +35,11 @@ function* callCreateNoteSaga({ payload }: PayloadAction<ICreateNotePayload>) {
   }
 }
 
-function* deletedNoteSaga() {
-  yield takeLatest(REMOVE_NOTE, callDeleteNoteSaga);
+function* removeNoteSaga() {
+  yield takeLatest(REMOVE_NOTE, callRemoveNoteSaga);
 }
 
-function* callDeleteNoteSaga({ payload }: PayloadAction<IRemoveNotePayload>) {
+function* callRemoveNoteSaga({ payload }: PayloadAction<IRemoveNotePayload>) {
   try {
     yield put(removingNoteAction());
     const { id, fileName } = payload;
