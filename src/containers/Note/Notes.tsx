@@ -5,7 +5,6 @@ import React, {
   FC,
   ChangeEvent,
   FormEvent,
-  MouseEvent,
 } from 'react';
 import { RouteComponentProps } from 'react-router';
 import {
@@ -24,6 +23,13 @@ import { s3Upload } from '../../libs/awsLib';
 import config from '../../config/aws.config';
 
 import { useNotesStyle } from './Notes.style';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeNoteAction } from '../../store/reducers/note';
+import {
+  selectNoteRemoving,
+  selectNoteRemoved,
+  selectNoteRemoveError,
+} from '../../store/selector/note';
 
 export interface INotes {
   useId: string;
@@ -34,18 +40,24 @@ export interface INotes {
   attachmentURL?: string;
 }
 
-const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
+const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
+  const { push: historyPush } = history;
+
   const classes = useNotesStyle();
+  const dispatch = useDispatch();
   const file = useRef<File | null>(null);
+
+  const removing = useSelector(selectNoteRemoving);
+  const removed = useSelector(selectNoteRemoved);
+  const removeError = useSelector(selectNoteRemoveError);
+
   const [note, setNote] = useState<INotes | null>(null);
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const loadNote = () =>
-      API.get('notes', `/notes/${props.match.params.id}`, null);
+    const loadNote = () => API.get('notes', `/notes/${match.params.id}`, null);
 
     const onLoad = async () => {
       try {
@@ -64,7 +76,15 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
     };
 
     onLoad();
-  }, [props.match.params.id]);
+  }, [match.params.id]);
+
+  useEffect(() => {
+    if (removed) historyPush('/');
+  }, [removed, historyPush]);
+
+  useEffect(() => {
+    if (removeError) alert(removeError);
+  }, [removeError]);
 
   const validateForm = () => content.length > 0;
   const formatFilename = (str: string) => str.replace(/^\w+-/, '');
@@ -76,7 +96,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
   };
 
   const saveNote = (note: { content: string; attachment?: string }) =>
-    API.put('notes', `/notes/${props.match.params.id}`, {
+    API.put('notes', `/notes/${match.params.id}`, {
       body: note,
     });
 
@@ -106,36 +126,20 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
         content,
         attachment: attachment || note.attachment,
       });
-      props.history.push('/');
+      historyPush('/');
     } catch (e) {
       alert(e);
       setIsLoading(false);
     }
   };
 
-  const deleteNote = () =>
-    API.del('notes', `/notes/${props.match.params.id}`, null);
-
-  const handleDelete = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-
+  const handleRemove = async () => {
     const confirmed = window.confirm(
       'Are you sure you want to delete this note?'
     );
 
-    if (!confirmed) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    try {
-      await deleteNote();
-      props.history.push('/');
-    } catch (e) {
-      alert(e);
-      setIsDeleting(false);
-    }
+    if (!confirmed) return;
+    dispatch(removeNoteAction({ id: match.params.id, fileName }));
   };
 
   return (
@@ -185,11 +189,11 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
             <Grid xs={12} sm={6} item>
               <LoaderButton
                 variant="outlined"
-                onClick={handleDelete}
-                isLoading={isDeleting}
+                onClick={handleRemove}
+                isLoading={removing}
                 fullWidth
               >
-                Delete
+                Remove
               </LoaderButton>
             </Grid>
 
