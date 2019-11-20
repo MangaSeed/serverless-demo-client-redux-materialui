@@ -17,6 +17,13 @@ interface INoteCreateState {
   data: INote | null;
 }
 
+interface INoteFetchState {
+  fetching: boolean;
+  fetched: boolean;
+  error: string;
+  data: INote | null;
+}
+
 interface INoteRemoveState {
   removing: boolean;
   removed: boolean;
@@ -32,6 +39,7 @@ interface INoteUpdateState {
 
 interface INoteState {
   create: INoteCreateState;
+  fetch: INoteFetchState;
   remove: INoteRemoveState;
   update: INoteUpdateState;
 }
@@ -71,12 +79,20 @@ type UpdateNoteActionType = (params: IUpdateNotePayload) => IUpdateNoteAction;
 
 /** NOTE CONSTANTS */
 export const CREATE_NOTE = 'note/createNoteAction';
+export const FETCH_NOTE = 'note/fetchNoteAction';
 export const REMOVE_NOTE = 'note/removeNoteAction';
 export const UPDATE_NOTE = 'note/updateNoteAction';
 
 const INIT_NOTE_CREATE_STATE: INoteCreateState = {
   creating: false,
   created: false,
+  error: '',
+  data: null,
+};
+
+const INIT_NOTE_FETCH_STATE: INoteFetchState = {
+  fetching: false,
+  fetched: false,
   error: '',
   data: null,
 };
@@ -96,6 +112,7 @@ const INIT_NOTE_UPDATE_STATE: INoteUpdateState = {
 
 const INIT_NOTE_STATE: INoteState = {
   create: INIT_NOTE_CREATE_STATE,
+  fetch: INIT_NOTE_FETCH_STATE,
   remove: INIT_NOTE_REMOVE_STATE,
   update: INIT_NOTE_UPDATE_STATE,
 };
@@ -122,6 +139,18 @@ const noteSlice = createSlice({
         ...INIT_NOTE_CREATE_STATE,
         error: payload,
       };
+    },
+
+    fetchingNoteAction: state => {
+      state.fetch = { ...INIT_NOTE_FETCH_STATE, fetching: true };
+    },
+
+    fetchedNoteAction: (state, { payload }: PayloadAction<INote>) => {
+      state.fetch = { ...INIT_NOTE_FETCH_STATE, fetched: true, data: payload };
+    },
+
+    fetchNoteErrorAction: (state, { payload }: PayloadAction<string>) => {
+      state.fetch = { ...INIT_NOTE_FETCH_STATE, error: payload };
     },
 
     removingNoteAction: state => {
@@ -169,6 +198,10 @@ export const createNoteAction = createAction<
   typeof CREATE_NOTE
 >(CREATE_NOTE, params => ({ payload: params }));
 
+export const fetchNoteAction = createAction<string, typeof FETCH_NOTE>(
+  FETCH_NOTE
+);
+
 export const removeNoteAction = createAction<
   RemoveNoteActionType,
   typeof REMOVE_NOTE
@@ -184,6 +217,9 @@ export const {
   createdNoteAction,
   createNoteErrorAction,
   creatingNoteAction,
+  fetchedNoteAction,
+  fetchingNoteAction,
+  fetchNoteErrorAction,
   removedNoteAction,
   removeNoteErrorAction,
   removingNoteAction,
