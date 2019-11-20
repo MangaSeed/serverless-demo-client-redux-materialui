@@ -1,7 +1,12 @@
 import { call, fork, takeLatest, put } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 
-import { addNote, deleteNote, updateNote } from '../../services/note';
+import {
+  addNote,
+  deleteNote,
+  updateNote,
+  fetchNote,
+} from '../../services/note';
 
 import {
   INote,
@@ -20,10 +25,15 @@ import {
   updatingNoteAction,
   updatedNoteAction,
   IUpdateNotePayload,
+  FETCH_NOTE,
+  fetchNoteErrorAction,
+  fetchingNoteAction,
+  fetchedNoteAction,
 } from '../reducers/note';
 
 export const noteSagas = [
   fork(createNoteSaga),
+  fork(fetchNoteSaga),
   fork(deletedNoteSaga),
   fork(updateNoteSaga),
 ];
@@ -72,5 +82,19 @@ function* callUpdateNoteSaga({ payload }: PayloadAction<IUpdateNotePayload>) {
     yield put(updatedNoteAction(updated));
   } catch (err) {
     yield put(updateNoteErrorAction(err.message));
+  }
+}
+
+function* fetchNoteSaga() {
+  yield takeLatest(FETCH_NOTE, callFetchNoteSaga);
+}
+
+function* callFetchNoteSaga({ payload }: PayloadAction<string>) {
+  try {
+    yield put(fetchingNoteAction());
+    const fetched: INote = yield call(fetchNote, payload);
+    yield put(fetchedNoteAction(fetched));
+  } catch (err) {
+    yield put(fetchNoteErrorAction(err.message));
   }
 }
