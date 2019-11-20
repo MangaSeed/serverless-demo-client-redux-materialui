@@ -1,51 +1,49 @@
-import React, { useState, useEffect, Fragment, FC } from 'react';
+import React, { useEffect, Fragment, FC } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  Box,
+  CircularProgress,
   Divider,
+  Grid,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Box,
 } from '@material-ui/core';
 import { NoteAdd as NoteAddIcon } from '@material-ui/icons';
-import { API } from 'aws-amplify';
 
-import { INote } from '../../store/reducers/note';
+import { INote, fetchNoteListAction } from '../../store/reducers/note';
+
+import {
+  selectNoteListData,
+  selectNoteListFetching,
+  selectNoteListError,
+} from '../../store/selector/note';
 
 import { IAppProps } from '../../Routes';
 
 import { useHomeStyle } from './Home.style';
+import { useDispatch, useSelector } from 'react-redux';
 
-const Home: FC<IAppProps> = props => {
+const Home: FC<IAppProps> = ({ isAuthenticated }) => {
   const classes = useHomeStyle();
-  const [notes, setNotes] = useState<INote[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
+
+  const notes = useSelector(selectNoteListData);
+  const fetchingList = useSelector(selectNoteListFetching);
+  const listError = useSelector(selectNoteListError);
 
   useEffect(() => {
-    async function onLoad() {
-      if (!props.isAuthenticated) {
-        return;
-      }
+    if (isAuthenticated) dispatch(fetchNoteListAction());
+  }, [isAuthenticated, dispatch]);
 
-      try {
-        const notes = await loadNotes();
-        setNotes(notes);
-      } catch (e) {
-        alert(e);
-      }
-
-      setIsLoading(false);
-    }
-
-    onLoad();
-  }, [props.isAuthenticated]);
-
-  const loadNotes = () => API.get('notes', '/notes', null);
+  useEffect(() => {
+    if (listError) alert(listError);
+  }, [listError]);
 
   const renderNotesList = (notes: INote[]) => {
     return (
-      <>
+      <List>
         <ListItem button component={Link} to="/notes/new">
           <ListItemIcon>
             <NoteAddIcon />
@@ -66,7 +64,7 @@ const Home: FC<IAppProps> = props => {
             {Boolean(notes.length !== i + 1) && <Divider />}
           </Fragment>
         ))}
-      </>
+      </List>
     );
   };
 
@@ -83,12 +81,20 @@ const Home: FC<IAppProps> = props => {
     return (
       <Box>
         <h1>Your Notes</h1>
-        <List>{!isLoading && renderNotesList(notes)}</List>
+        {fetchingList ? (
+          <Grid container justify="center">
+            <Box p={10}>
+              <CircularProgress />
+            </Box>
+          </Grid>
+        ) : (
+          renderNotesList(notes)
+        )}
       </Box>
     );
   };
 
-  return props.isAuthenticated ? renderNotes() : renderLander();
+  return isAuthenticated ? renderNotes() : renderLander();
 };
 
 export default Home;
