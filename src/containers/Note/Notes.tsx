@@ -4,7 +4,7 @@ import React, {
   useEffect,
   FC,
   ChangeEvent,
-  FormEvent,
+  FormEvent
 } from 'react';
 import { RouteComponentProps } from 'react-router';
 import {
@@ -12,7 +12,7 @@ import {
   Container,
   Grid,
   TextField,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import { API, Storage } from 'aws-amplify';
 
@@ -24,11 +24,14 @@ import config from '../../config/aws.config';
 
 import { useNotesStyle } from './Notes.style';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeNoteAction } from '../../store/reducers/note';
+import {
+  removeNoteAction,
+  clearNoteStateAction
+} from '../../store/reducers/note';
 import {
   selectNoteRemoving,
   selectNoteRemoved,
-  selectNoteRemoveError,
+  selectNoteRemoveError
 } from '../../store/selector/note';
 
 export interface INotes {
@@ -79,8 +82,11 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   }, [match.params.id]);
 
   useEffect(() => {
-    if (removed) historyPush('/');
-  }, [removed, historyPush]);
+    if (removed) {
+      historyPush('/');
+      dispatch(clearNoteStateAction('remove'));
+    }
+  }, [removed, historyPush, dispatch]);
 
   useEffect(() => {
     if (removeError) alert(removeError);
@@ -97,7 +103,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
 
   const saveNote = (note: { content: string; attachment?: string }) =>
     API.put('notes', `/notes/${match.params.id}`, {
-      body: note,
+      body: note
     });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -124,7 +130,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
 
       await saveNote({
         content,
-        attachment: attachment || note.attachment,
+        attachment: attachment || note.attachment
       });
       historyPush('/');
     } catch (e) {
@@ -138,8 +144,11 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
       'Are you sure you want to delete this note?'
     );
 
-    if (!confirmed) return;
-    dispatch(removeNoteAction({ id: match.params.id, fileName }));
+    if (!confirmed || !note) return;
+
+    dispatch(
+      removeNoteAction({ id: match.params.id, fileName: note.attachment })
+    );
   };
 
   return (
@@ -188,6 +197,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
           <Grid spacing={2} container>
             <Grid xs={12} sm={6} item>
               <LoaderButton
+                id="removeNoteButton"
                 variant="outlined"
                 onClick={handleRemove}
                 isLoading={removing}
