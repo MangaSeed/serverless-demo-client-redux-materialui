@@ -135,6 +135,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
       <Container maxWidth="md">
         <form className={classes.notesForm} onSubmit={handleSubmit}>
           <TextField
+            id="content"
             label="Note"
             variant="outlined"
             value={content}
@@ -188,6 +189,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
 
             <Grid xs={12} sm={6} item>
               <LoaderButton
+                id="updateNoteButton"
                 color="primary"
                 type="submit"
                 variant="contained"
