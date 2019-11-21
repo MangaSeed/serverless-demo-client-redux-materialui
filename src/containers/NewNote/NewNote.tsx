@@ -23,7 +23,7 @@ import {
 
 import LoaderButton from '../../components/LoaderButton';
 
-import config from '../../config';
+import config from '../../config/aws.config';
 
 import { useNewNoteStyle } from './NewNote.style';
 

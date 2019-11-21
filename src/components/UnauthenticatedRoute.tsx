@@ -29,7 +29,7 @@ const UnauthenticatedRoute: FC<IRouteProps> = ({
     <Route
       {...rest}
       render={props =>
-        !appProps.isAuthenticated && C ? (
+        !appProps.checkedAuth && C ? (
           <C {...appProps} {...props} />
         ) : (
           <Redirect
