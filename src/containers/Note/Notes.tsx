@@ -153,7 +153,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
             Attachment
           </Typography>
           {note && note.attachment && (
-            <Typography variant="h6">
+            <Typography variant="h6" id="attachmentLink">
               <a
                 target="_blank"
                 rel="noopener noreferrer"
@@ -171,8 +171,8 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
             style={{ display: 'none' }}
             onChange={handleFileChange}
           />
-          <label htmlFor="file">
-            <Button variant="outlined" component="span">
+          <label htmlFor="file" id="fileNameLabel">
+            <Button variant="outlined" component="span" id="uploadFileButton">
               Upload
             </Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
