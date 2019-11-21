@@ -36,10 +36,21 @@ describe('Note - Delete', () => {
 
   it('can delete a note along w/ file attached', () => {
     cy.server();
+    cy.route('GET', `${awsConfig.apiGateway.URL}/notes`).as('getNotes');
     cy.route('DELETE', `${awsConfig.apiGateway.URL}/notes/*`).as('deleteNote');
+
     cy.get('#removeNoteButton').click();
+
     cy.wait('@deleteNote')
       .its('status')
       .should('be', 200);
+
+    cy.wait('@getNotes').then(xhr => {
+      const response = xhr.responseBody;
+      const note = response.filter(note => note.noteId === createdNote.noteId);
+      expect(note).to.be.empty;
+    });
+
+    cy.contains(createdNote.content).should('not.exist');
   });
 });
