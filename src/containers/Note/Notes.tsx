@@ -4,7 +4,7 @@ import React, {
   useEffect,
   FC,
   ChangeEvent,
-  FormEvent,
+  FormEvent
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
@@ -15,14 +15,14 @@ import {
   Container,
   Grid,
   TextField,
-  Typography,
+  Typography
 } from '@material-ui/core';
 
 import {
+  fetchNoteAction,
   removeNoteAction,
   updateNoteAction,
-  clearNoteStateAction,
-  fetchNoteAction,
+  clearNoteStateAction
 } from '../../store/reducers/note';
 
 import {
@@ -35,7 +35,7 @@ import {
   selectNoteFetched,
   selectNoteFetchData,
   selectNoteFetching,
-  selectNoteFetchError,
+  selectNoteFetchError
 } from '../../store/selector/note';
 
 import LoaderButton from '../../components/LoaderButton';
@@ -122,8 +122,11 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
       'Are you sure you want to delete this note?'
     );
 
-    if (!confirmed) return;
-    dispatch(removeNoteAction({ id: match.params.id, fileName }));
+    if (!confirmed || !note) return;
+
+    dispatch(
+      removeNoteAction({ id: match.params.id, fileName: note.attachment })
+    );
   };
 
   return (
@@ -137,6 +140,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
       ) : (
         <form className={classes.notesForm} onSubmit={handleSubmit}>
           <TextField
+            id="content"
             label="Note"
             variant="outlined"
             value={content}
@@ -178,6 +182,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
           <Grid spacing={2} container>
             <Grid xs={12} sm={6} item>
               <LoaderButton
+                id="removeNoteButton"
                 variant="outlined"
                 onClick={handleRemove}
                 isLoading={removing}
@@ -189,6 +194,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
 
             <Grid xs={12} sm={6} item>
               <LoaderButton
+                id="updateNoteButton"
                 color="primary"
                 type="submit"
                 variant="contained"
