@@ -24,11 +24,14 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-import Amplify, { Auth } from 'aws-amplify';
+import Amplify, { Auth, API, Storage } from 'aws-amplify';
 
+import 'cypress-file-upload';
 import '@testing-library/cypress/add-commands';
 
-import config from '../../src/config/aws.config.js';
+import config from './config/aws.config';
+
+const ENDPOINT = 'notes';
 
 Amplify.configure({
   Auth: {
@@ -46,7 +49,7 @@ Amplify.configure({
   API: {
     endpoints: [
       {
-        name: 'notes',
+        name: ENDPOINT,
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION
       }
@@ -65,4 +68,9 @@ Cypress.Commands.add('checkAuth', async () => {
   } catch (err) {
     return err.message || err;
   }
+});
+
+Cypress.Commands.add('removeNote', async (id, fileName) => {
+  if (fileName) await Storage.vault.remove(fileName);
+  await API.del(ENDPOINT, `/notes/${id}`, null);
 });
