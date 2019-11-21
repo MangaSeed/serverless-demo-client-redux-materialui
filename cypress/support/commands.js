@@ -70,7 +70,34 @@ Cypress.Commands.add('checkAuth', async () => {
   }
 });
 
+Cypress.Commands.add('createNote', async (content, file) => {
+  let attachment;
+
+  if (file) {
+    const fileName = `${Date.now()}-${file.name}`;
+    const savedFile = await Storage.vault.put(fileName, file, {
+      contentType: file.type
+    });
+    attachment = savedFile.key;
+  }
+
+  return await API.post(ENDPOINT, '/notes', {
+    body: { content, attachment }
+  });
+});
+
 Cypress.Commands.add('removeNote', async (id, fileName) => {
   if (fileName) await Storage.vault.remove(fileName);
   await API.del(ENDPOINT, `/notes/${id}`, null);
+});
+
+Cypress.Commands.add('fetchNote', async id => {
+  const data = await API.get(ENDPOINT, `/notes/${id}`, null);
+
+  if (data.attachment) {
+    const fileAttachment = await Storage.vault.get(data.attachment);
+    if (typeof fileAttachment === 'string') data.attachmentURL = fileAttachment;
+  }
+
+  return data;
 });
