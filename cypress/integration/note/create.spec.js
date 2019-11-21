@@ -6,14 +6,6 @@ const NOTE_CONTENT = `Note - ${v4()}`;
 describe('Note - Create', () => {
   const createdNotes = [];
 
-  after(() => {
-    const removedNotes = createdNotes.map(note =>
-      cy.removeNote(note.noteId, note.attachment)
-    );
-
-    Promise.all(removedNotes);
-  });
-
   beforeEach(() => {
     cy.visit('/');
     const mail = Cypress.env('mail');
@@ -112,5 +104,13 @@ describe('Note - Create', () => {
       expect(response.content).to.be.equal(NOTE_CONTENT);
       expect(status).to.be.equal(200);
     });
+  });
+
+  after(() => {
+    const removedNotes = createdNotes.map(note =>
+      cy.removeNote(note.noteId, note.attachment)
+    );
+
+    Promise.all(removedNotes);
   });
 });
