@@ -78,6 +78,7 @@ const NewNote: FC<RouteComponentProps> = ({ history }) => {
     <Container maxWidth="sm">
       <form onSubmit={handleSubmit} className={classes.newNoteForm}>
         <TextField
+          id="content"
           label="Note"
           variant="outlined"
           value={content}
@@ -94,13 +95,14 @@ const NewNote: FC<RouteComponentProps> = ({ history }) => {
           onChange={handleFileChange}
         />
         <label htmlFor="file">
-          <Button variant="outlined" component="span">
+          <Button variant="outlined" component="span" id="uploadFileButton">
             Upload
           </Button>
           &nbsp;&nbsp;&nbsp;&nbsp;
           {fileName ? fileName : 'Select a file'}
         </label>
         <LoaderButton
+          id="createButton"
           type="submit"
           variant="contained"
           color="primary"
