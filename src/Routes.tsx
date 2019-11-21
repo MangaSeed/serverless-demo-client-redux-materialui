@@ -1,11 +1,11 @@
-import React, { FC, Dispatch, SetStateAction } from 'react';
+import React, { FC } from 'react';
 import { Route, Switch, RouteProps } from 'react-router-dom';
 import AppliedRoute from './components/AppliedRoute';
 import AuthenticatedRoute from './components/AuthenticatedRoute';
 import UnauthenticatedRoute from './components/UnauthenticatedRoute';
 
 import Home from './containers/Home/Home';
-import Login from './containers/Login/Login';
+import Signin from './containers/Signin/Signin';
 import Notes from './containers/Note/Notes';
 import Signup from './containers/Signup/Signup';
 import NewNote from './containers/NewNote/NewNote';
@@ -13,8 +13,7 @@ import Settings from './containers/Settings/Settings';
 import NotFound from './containers/NotFound/NotFound';
 
 export interface IAppProps {
-  isAuthenticated: boolean;
-  userHasAuthenticated: Dispatch<SetStateAction<boolean>>;
+  checkedAuth: boolean;
 }
 
 export interface IRouteProps extends RouteProps {
@@ -28,9 +27,9 @@ const Routes: FC<{ appProps: IAppProps }> = ({ appProps }) => {
     <Switch>
       <AppliedRoute path="/" exact component={Home} appProps={appProps} />
       <UnauthenticatedRoute
-        path="/login"
+        path="/signin"
         exact
-        component={Login}
+        component={Signin}
         appProps={appProps}
       />
       <UnauthenticatedRoute

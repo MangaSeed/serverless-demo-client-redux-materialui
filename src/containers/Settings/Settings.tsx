@@ -10,7 +10,7 @@ import { API } from 'aws-amplify';
 
 import BillingForm from '../../components/BillingForm';
 
-import config from '../../config';
+import config from '../../config/aws.config';
 
 const Settings: FC<RouteComponentProps> = props => {
   const [isLoading, setIsLoading] = useState(false);

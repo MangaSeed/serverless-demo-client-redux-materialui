@@ -4,7 +4,7 @@ import React, {
   useEffect,
   FC,
   ChangeEvent,
-  FormEvent,
+  FormEvent
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
@@ -13,15 +13,15 @@ import {
   Container,
   Grid,
   TextField,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import { API, Storage } from 'aws-amplify';
 
 import {
-  removeNoteAction,
   INote,
+  removeNoteAction,
   updateNoteAction,
-  clearNoteStateAction,
+  clearNoteStateAction
 } from '../../store/reducers/note';
 
 import {
@@ -30,7 +30,7 @@ import {
   selectNoteRemoveError,
   selectNoteUpdating,
   selectNoteUpdated,
-  selectNoteUpdateError,
+  selectNoteUpdateError
 } from '../../store/selector/note';
 
 import LoaderButton from '../../components/LoaderButton';
@@ -123,8 +123,11 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
       'Are you sure you want to delete this note?'
     );
 
-    if (!confirmed) return;
-    dispatch(removeNoteAction({ id: match.params.id, fileName }));
+    if (!confirmed || !note) return;
+
+    dispatch(
+      removeNoteAction({ id: match.params.id, fileName: note.attachment })
+    );
   };
 
   return (
@@ -173,6 +176,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
           <Grid spacing={2} container>
             <Grid xs={12} sm={6} item>
               <LoaderButton
+                id="removeNoteButton"
                 variant="outlined"
                 onClick={handleRemove}
                 isLoading={removing}
