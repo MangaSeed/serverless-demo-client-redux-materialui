@@ -20,7 +20,7 @@ import LoaderButton from '../../components/LoaderButton';
 
 import { s3Upload } from '../../libs/awsLib';
 
-import config from '../../config';
+import config from '../../config/aws.config';
 
 import { useNotesStyle } from './Notes.style';
 import { useDispatch, useSelector } from 'react-redux';

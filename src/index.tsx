@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import Amplify from 'aws-amplify';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import config from './config';
+import config from './config/aws.config';
 
 import App from './App';
 

@@ -24,7 +24,7 @@ const Home: FC<IAppProps> = props => {
 
   useEffect(() => {
     async function onLoad() {
-      if (!props.isAuthenticated) {
+      if (!props.checkedAuth) {
         return;
       }
 
@@ -39,7 +39,7 @@ const Home: FC<IAppProps> = props => {
     }
 
     onLoad();
-  }, [props.isAuthenticated]);
+  }, [props.checkedAuth]);
 
   const loadNotes = () => API.get('notes', '/notes', null);
 
@@ -88,7 +88,7 @@ const Home: FC<IAppProps> = props => {
     );
   };
 
-  return props.isAuthenticated ? renderNotes() : renderLander();
+  return props.checkedAuth ? renderNotes() : renderLander();
 };
 
 export default Home;
