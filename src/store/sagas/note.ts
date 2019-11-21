@@ -34,7 +34,7 @@ import {
 export const noteSagas = [
   fork(createNoteSaga),
   fork(fetchNoteSaga),
-  fork(deletedNoteSaga),
+  fork(removeNoteSaga),
   fork(updateNoteSaga)
 ];
 
