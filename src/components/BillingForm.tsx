@@ -1,100 +1,61 @@
-import React, { useState, useImperativeHandle, FormEvent, FC } from 'react';
+import React, { useState, FormEvent, FC, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import {
   CardElement,
   injectStripe,
-  ReactStripeElements
+  ReactStripeElements,
 } from 'react-stripe-elements';
 import { TextField, Divider } from '@material-ui/core';
-import { useTheme, fade } from '@material-ui/core/styles';
-import { InputBaseComponentProps } from '@material-ui/core/InputBase';
+
+import { saveBillAction, resetBillAction } from '../store/reducers/bill';
+
+import {
+  selectBillSaving,
+  selectBillSaveError,
+  selectBillSaved,
+} from '../store/selectors/bill';
 
 import LoaderButton from './LoaderButton';
+import StripeInput from './StripeInput';
 
 import { useFormFields } from '../libs/hooksLib';
 
-const StripeInput: FC<InputBaseComponentProps> = props => {
-  const {
-    component: Component,
-    inputRef,
-    'aria-invalid': ariaInvalid,
-    'aria-describedby': ariaDescribeBy,
-    defaultValue,
-    required,
-    onKeyDown,
-    onKeyUp,
-    readOnly,
-    autoComplete,
-    autoFocus,
-    type,
-    name,
-    rows,
-    handleCardChange,
-    ...other
-  } = props;
-  const theme = useTheme();
-  const [mountNode, setMountNode] = useState();
-
-  useImperativeHandle(
-    inputRef,
-    () => ({
-      focus: () => mountNode.focus()
-    }),
-    [mountNode]
-  );
-
-  const handleChange = (event: ReactStripeElements.ElementChangeResponse) =>
-    handleCardChange(event);
-
-  return (
-    <Component
-      {...other}
-      onReady={setMountNode}
-      style={{
-        base: {
-          color: theme.palette.text.primary,
-          fontSize: `${theme.typography.fontSize}px`,
-          fontFamily: theme.typography.fontFamily,
-          '::placeholder': {
-            color: fade(theme.palette.text.primary, 0.42)
-          }
-        },
-        invalid: {
-          color: theme.palette.text.primary
-        }
-      }}
-      onChange={handleChange}
-    />
-  );
-};
-
-interface IBillingProps {
-  isLoading?: boolean;
-  onSubmit: (
-    storage: string,
-    token: ReactStripeElements.PatchedTokenResponse
-  ) => Promise<void>;
-}
-
-const BillingForm: FC<
-  IBillingProps & ReactStripeElements.InjectedStripeProps
-> = ({ isLoading, onSubmit, ...props }) => {
+const BillingForm: FC<ReactStripeElements.InjectedStripeProps> = ({
+  stripe,
+}) => {
+  const dispatch = useDispatch();
+  const { push: historyPush } = useHistory();
   const [fields, handleFieldChange] = useFormFields({
     name: '',
-    storage: ''
+    storage: '',
   });
-  const [isProcessing, setIsProcessing] = useState(false);
+
+  const { storage, name } = fields;
+
+  const saving = useSelector(selectBillSaving);
+  const saved = useSelector(selectBillSaved);
+  const error = useSelector(selectBillSaveError);
+
   const [isCardComplete, setIsCardComplete] = useState(false);
   const [cardError, setCardError] = useState('');
 
-  isLoading = isProcessing || isLoading;
+  useEffect(() => {
+    if (saved) {
+      historyPush('/');
+      dispatch(resetBillAction());
+    }
+  }, [saved, dispatch, historyPush]);
 
-  const validateForm = () => {
-    return fields.name !== '' && fields.storage !== '' && isCardComplete;
-  };
+  useEffect(() => {
+    if (error) alert(error);
+  }, [error]);
+
+  const validateForm = () => name !== '' && storage !== '' && isCardComplete;
 
   const handleCardChange = ({
     complete,
-    error
+    error,
   }: ReactStripeElements.ElementChangeResponse) => {
     if (error && error.message) {
       setCardError(error.message);
@@ -105,24 +66,22 @@ const BillingForm: FC<
     }
   };
 
-  const handleSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!props.stripe) return;
+    if (!stripe) return;
 
-    setIsProcessing(true);
-
-    const { token, error } = await props.stripe.createToken({
-      name: fields.name
-    });
-
-    setIsProcessing(false);
-
-    onSubmit(fields.storage, { token, error });
+    dispatch(
+      saveBillAction({
+        name,
+        stripe,
+        storage: Number(storage),
+      })
+    );
   };
 
   return (
-    <form onSubmit={handleSubmitClick}>
+    <form onSubmit={handleSubmit}>
       <TextField
         label="Storage"
         placeholder="Number of storage"
@@ -150,6 +109,7 @@ const BillingForm: FC<
         fullWidth
       />
       <TextField
+        id="card"
         margin="normal"
         label="Credit/Debit card information"
         variant="outlined"
@@ -158,15 +118,16 @@ const BillingForm: FC<
         InputLabelProps={{ shrink: true }}
         InputProps={{
           inputProps: { component: CardElement, handleCardChange },
-          inputComponent: StripeInput
+          inputComponent: StripeInput,
         }}
         fullWidth
       />
       <LoaderButton
+        id="saveBillButton"
         type="submit"
         variant="contained"
         color="primary"
-        isLoading={isLoading}
+        isLoading={saving}
         disabled={!validateForm()}
         fullWidth
       >
