@@ -36,22 +36,22 @@ Amplify.configure({
     region: config.cognito.REGION,
     userPoolId: config.cognito.USER_POOL_ID,
     identityPoolId: config.cognito.IDENTITY_POOL_ID,
-    userPoolWebClientId: config.cognito.APP_CLIENT_ID
+    userPoolWebClientId: config.cognito.APP_CLIENT_ID,
   },
   Storage: {
     region: config.s3.REGION,
     bucket: config.s3.BUCKET,
-    identityPoolId: config.cognito.IDENTITY_POOL_ID
+    identityPoolId: config.cognito.IDENTITY_POOL_ID,
   },
   API: {
     endpoints: [
       {
         name: 'notes',
         endpoint: config.apiGateway.URL,
-        region: config.apiGateway.REGION
-      }
-    ]
-  }
+        region: config.apiGateway.REGION,
+      },
+    ],
+  },
 });
 
 Cypress.Commands.add('signIn', (mail, pass) => {
@@ -66,3 +66,30 @@ Cypress.Commands.add('checkAuth', async () => {
     return err.message || err;
   }
 });
+
+Cypress.Commands.add('loadFrame', { prevSubject: 'element' }, $iframe => {
+  const contentWindow = $iframe.prop('contentWindow');
+  return new Promise(resolve => {
+    if (contentWindow && contentWindow.document.readyState === 'complete') {
+      resolve(contentWindow);
+    } else {
+      $iframe.on('load', () => {
+        resolve(contentWindow);
+      });
+    }
+  });
+});
+
+Cypress.Commands.add(
+  'getElement',
+  { prevSubject: 'document' },
+  (document, selector) => Cypress.$(selector, document)
+);
+
+Cypress.Commands.add('getWithinFrame', (frameElement, targetElement) =>
+  cy
+    .get(frameElement)
+    .loadFrame()
+    .its('document')
+    .getElement(targetElement)
+);
