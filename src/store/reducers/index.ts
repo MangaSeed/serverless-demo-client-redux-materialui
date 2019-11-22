@@ -1,11 +1,13 @@
 import { combineReducers } from 'redux';
 
-import { noteReducer } from './note';
 import { authReducer } from './auth';
+import { billReducer } from './bill';
+import { noteReducer } from './note';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
-  note: noteReducer
+  bill: billReducer,
+  note: noteReducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
