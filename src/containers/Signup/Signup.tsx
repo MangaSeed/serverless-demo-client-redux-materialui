@@ -1,14 +1,31 @@
-import React, { useState, FC, FormEvent } from 'react';
+import React, { FormEvent, useEffect, FC } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import { TextField, Container } from '@material-ui/core';
-import { Auth } from 'aws-amplify';
-import { ISignUpResult } from 'amazon-cognito-identity-js';
+
+import {
+  signUpAuthAction,
+  activateAuthAction,
+  signInAuthAction,
+  checkedAuthAction,
+  resetAuthInnerStateAction
+} from '../../store/reducers/auth';
+
+import {
+  selectAuthSigningUp,
+  selectAuthSignedUp,
+  selectAuthSignUpError,
+  selectAuthActivating,
+  selectAuthActivated,
+  selectAuthActivateError,
+  selectAuthSigningIn,
+  selectAuthSignedIn,
+  selectAuthSignInError
+} from '../../store/selectors/auth';
 
 import LoaderButton from '../../components/LoaderButton';
 
 import { useFormFields } from '../../libs/hooksLib';
-
-import { IAppProps } from '../../Routes';
 
 interface IFormFields {
   email: string;
@@ -24,18 +41,50 @@ const INITIAL_FORM_FIELDS: IFormFields = {
   confirmationCode: ''
 };
 
-const Signup: FC<IAppProps & RouteComponentProps> = props => {
+const Signup: FC<RouteComponentProps> = ({ history }) => {
+  const { push: historyPush } = history;
+  const dispatch = useDispatch();
+
+  const signingUp = useSelector(selectAuthSigningUp);
+  const signedUp = useSelector(selectAuthSignedUp);
+  const signUpError = useSelector(selectAuthSignUpError);
+
+  const activating = useSelector(selectAuthActivating);
+  const activated = useSelector(selectAuthActivated);
+  const activateError = useSelector(selectAuthActivateError);
+
+  const signingIn = useSelector(selectAuthSigningIn);
+  const signedIn = useSelector(selectAuthSignedIn);
+  const signInError = useSelector(selectAuthSignInError);
+
   const [fields, handleFieldChange] = useFormFields<IFormFields>(
     INITIAL_FORM_FIELDS
   );
-  const [newUser, setNewUser] = useState<ISignUpResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { email, password } = fields;
+
+  useEffect(() => {
+    if (signUpError) alert(signUpError);
+    if (activateError) alert(activateError);
+    if (signInError) alert(signInError);
+  }, [signUpError, activateError, signInError]);
+
+  useEffect(() => {
+    if (activated) dispatch(signInAuthAction(email, password));
+    if (signedIn) {
+      dispatch(checkedAuthAction(true));
+      dispatch(resetAuthInnerStateAction('signin'));
+      dispatch(resetAuthInnerStateAction('signup'));
+      dispatch(resetAuthInnerStateAction('activate'));
+      historyPush('/');
+    }
+  }, [activated, signedIn, historyPush, dispatch, email, password]);
 
   function validateForm() {
     return (
-      fields.email.length > 0 &&
-      fields.password.length > 0 &&
-      fields.password === fields.confirmPassword
+      email.length > 0 &&
+      password.length > 0 &&
+      password === fields.confirmPassword
     );
   }
 
@@ -43,46 +92,21 @@ const Signup: FC<IAppProps & RouteComponentProps> = props => {
     return fields.confirmationCode.length > 0;
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      const newUser: ISignUpResult = await Auth.signUp({
-        username: fields.email,
-        password: fields.password
-      });
-      setIsLoading(false);
-      setNewUser(newUser);
-    } catch (e) {
-      alert(e.message);
-      setIsLoading(false);
-    }
+    dispatch(signUpAuthAction(email, password));
   }
 
-  async function handleConfirmationSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleConfirmationSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      await Auth.confirmSignUp(fields.email, fields.confirmationCode);
-      await Auth.signIn(fields.email, fields.password);
-
-      props.userHasAuthenticated(true);
-      props.history.push('/');
-    } catch (e) {
-      alert(e.message);
-      setIsLoading(false);
-    }
+    dispatch(activateAuthAction(email, fields.confirmationCode));
   }
 
   function renderConfirmationForm() {
     return (
       <form onSubmit={handleConfirmationSubmit}>
         <TextField
-          id="confirmationCode"
+          id="confirmation-code"
           label="Confirmation code"
           margin="normal"
           name="confirmationCode"
@@ -98,9 +122,10 @@ const Signup: FC<IAppProps & RouteComponentProps> = props => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={isLoading}
+          isLoading={activating || signingIn}
           disabled={!validateConfirmationForm()}
           fullWidth
+          id="verify-button"
         >
           Verify
         </LoaderButton>
@@ -118,7 +143,7 @@ const Signup: FC<IAppProps & RouteComponentProps> = props => {
           name="email"
           type="email"
           variant="outlined"
-          value={fields.email}
+          value={email}
           onChange={handleFieldChange}
           fullWidth
         />
@@ -129,12 +154,12 @@ const Signup: FC<IAppProps & RouteComponentProps> = props => {
           name="password"
           type="password"
           variant="outlined"
-          value={fields.password}
+          value={password}
           onChange={handleFieldChange}
           fullWidth
         />
         <TextField
-          id="confirmPassword"
+          id="confirm-password"
           label="Confirm password"
           margin="normal"
           name="confirmPassword"
@@ -148,8 +173,9 @@ const Signup: FC<IAppProps & RouteComponentProps> = props => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={isLoading}
+          isLoading={signingUp}
           disabled={!validateForm()}
+          id="signup-button"
           fullWidth
         >
           Signup
@@ -160,7 +186,7 @@ const Signup: FC<IAppProps & RouteComponentProps> = props => {
 
   return (
     <Container maxWidth="sm">
-      {newUser === null ? renderForm() : renderConfirmationForm()}
+      {!signedUp ? renderForm() : renderConfirmationForm()}
     </Container>
   );
 };

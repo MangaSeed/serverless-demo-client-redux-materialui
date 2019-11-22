@@ -8,7 +8,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
+  ListItemText
 } from '@material-ui/core';
 import { NoteAdd as NoteAddIcon } from '@material-ui/icons';
 
@@ -17,7 +17,7 @@ import { INote, fetchNoteListAction } from '../../store/reducers/note';
 import {
   selectNoteListData,
   selectNoteListFetching,
-  selectNoteListError,
+  selectNoteListError
 } from '../../store/selector/note';
 
 import { IAppProps } from '../../Routes';

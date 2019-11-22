@@ -6,7 +6,7 @@ import {
   deleteNote,
   fetchNote,
   fetchNoteList,
-  updateNote,
+  updateNote
 } from '../../services/note';
 
 import {
@@ -33,15 +33,15 @@ import {
   fetchedNoteAction,
   fetchNoteListErrorAction,
   fetchingNoteListAction,
-  fetchedNoteListAction,
+  fetchedNoteListAction
 } from '../reducers/note';
 
 export const noteSagas = [
   fork(createNoteSaga),
-  fork(deletedNoteSaga),
   fork(fetchNoteListSaga),
   fork(fetchNoteSaga),
-  fork(updateNoteSaga),
+  fork(removeNoteSaga),
+  fork(updateNoteSaga)
 ];
 
 function* createNoteSaga() {
@@ -61,11 +61,11 @@ function* callCreateNoteSaga({ payload }: PayloadAction<ICreateNotePayload>) {
   }
 }
 
-function* deletedNoteSaga() {
-  yield takeLatest(REMOVE_NOTE, callDeleteNoteSaga);
+function* removeNoteSaga() {
+  yield takeLatest(REMOVE_NOTE, callRemoveNoteSaga);
 }
 
-function* callDeleteNoteSaga({ payload }: PayloadAction<IRemoveNotePayload>) {
+function* callRemoveNoteSaga({ payload }: PayloadAction<IRemoveNotePayload>) {
   try {
     yield put(removingNoteAction());
     const { id, fileName } = payload;
