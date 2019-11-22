@@ -25,7 +25,7 @@ import { IAppProps } from '../../Routes';
 import { useHomeStyle } from './Home.style';
 import { useDispatch, useSelector } from 'react-redux';
 
-const Home: FC<IAppProps> = ({ isAuthenticated }) => {
+const Home: FC<IAppProps> = ({ checkedAuth }) => {
   const classes = useHomeStyle();
   const dispatch = useDispatch();
 
@@ -34,8 +34,8 @@ const Home: FC<IAppProps> = ({ isAuthenticated }) => {
   const listError = useSelector(selectNoteListError);
 
   useEffect(() => {
-    if (isAuthenticated) dispatch(fetchNoteListAction());
-  }, [isAuthenticated, dispatch]);
+    if (checkedAuth) dispatch(fetchNoteListAction());
+  }, [checkedAuth, dispatch]);
 
   useEffect(() => {
     if (listError) alert(listError);
@@ -43,7 +43,7 @@ const Home: FC<IAppProps> = ({ isAuthenticated }) => {
 
   const renderNotesList = (notes: INote[]) => {
     return (
-      <List>
+      <List id="notes">
         <ListItem button component={Link} to="/notes/new">
           <ListItemIcon>
             <NoteAddIcon />
@@ -94,7 +94,7 @@ const Home: FC<IAppProps> = ({ isAuthenticated }) => {
     );
   };
 
-  return isAuthenticated ? renderNotes() : renderLander();
+  return checkedAuth ? renderNotes() : renderLander();
 };
 
 export default Home;
