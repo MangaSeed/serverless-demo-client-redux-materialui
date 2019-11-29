@@ -106,7 +106,7 @@ const NewNote: FC<RouteComponentProps> = ({ history }) => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={creatingNote}
+          isLoading={isLoading}
           disabled={!validateForm()}
           fullWidth
         >
