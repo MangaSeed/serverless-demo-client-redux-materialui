@@ -52,7 +52,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
   const signingIn = useSelector(selectAuthSigningIn);
   const signedIn = useSelector(selectAuthSignedIn);
 
-  const isLoading = activating || signingUp;
+  const isLoading = activating || signingUp || signingIn;
   const errors = useSelector(selectAuthErrors);
 
   const [fields, handleFieldChange] = useFormFields<IFormFields>(
@@ -169,7 +169,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={signingUp}
+          isLoading={isLoading}
           disabled={!validateForm()}
           id="signup-button"
           fullWidth
