@@ -12,11 +12,11 @@ const AuthenticatedRoute: FC<IRouteProps> = ({
     <Route
       {...rest}
       render={props =>
-        appProps.isAuthenticated && C ? (
+        appProps.checkedAuth && C ? (
           <C {...props} {...appProps} />
         ) : (
           <Redirect
-            to={`/login?redirect=${props.location.pathname}${props.location.search}`}
+            to={`/signin?redirect=${props.location.pathname}${props.location.search}`}
           />
         )
       }
