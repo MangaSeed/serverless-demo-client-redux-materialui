@@ -24,13 +24,13 @@ export const addNote = async (note: string, attachment?: File) => {
   return data;
 };
 
-export const fetchNotes = async (): Promise<INotes[]> => {
+export const fetchNotes = async (): Promise<INote[]> => {
   const { data } = await API.get(ENDPOINT, '/notes', null);
   return data;
 };
 
-export const fetchNote = async (id: string): Promise<INotes> => {
-  const { data }: { data: INotes } = await API.get(
+export const fetchNote = async (id: string): Promise<INote> => {
+  const { data }: { data: INote } = await API.get(
     ENDPOINT,
     `/notes/${id}`,
     null
