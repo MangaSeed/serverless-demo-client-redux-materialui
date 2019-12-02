@@ -6,14 +6,6 @@ const NOTE_CONTENT = `Note - ${v4()}`;
 describe('Note - Create', () => {
   const createdNotes = [];
 
-  after(() => {
-    const removedNotes = createdNotes.map(note =>
-      cy.removeNote(note.noteId, note.attachment)
-    );
-
-    Promise.all(removedNotes);
-  });
-
   beforeEach(() => {
     cy.visit('/');
     const mail = Cypress.env('mail');
@@ -45,7 +37,7 @@ describe('Note - Create', () => {
       cy.get('#file').upload({
         fileContent,
         fileName: FILE_NAME,
-        mimeType: 'image/jpeg'
+        mimeType: 'image/jpeg',
       });
     });
 
@@ -66,20 +58,18 @@ describe('Note - Create', () => {
     let createdNote = null;
 
     cy.wait('@createNote').then(xhr => {
-      const response = xhr.responseBody;
+      const { data } = xhr.responseBody;
       const status = xhr.status;
 
-      expect(response.content).to.be.equal(NOTE_CONTENT);
+      expect(data.content).to.be.equal(NOTE_CONTENT);
       expect(status).to.be.equal(200);
 
-      createdNote = response;
+      createdNote = data;
     });
 
     cy.wait('@getNotes').then(xhr => {
-      const response = xhr.responseBody;
-      const note = response.filter(
-        ({ noteId }) => noteId === createdNote.noteId
-      );
+      const { data } = xhr.responseBody;
+      const note = data.filter(({ noteId }) => noteId === createdNote.noteId);
 
       createdNotes.push(createdNote);
       expect(note).to.have.length(1);
@@ -98,19 +88,27 @@ describe('Note - Create', () => {
       cy.get('#file').upload({
         fileContent,
         fileName: FILE_NAME,
-        mimeType: 'image/jpeg'
+        mimeType: 'image/jpeg',
       });
     });
 
     cy.get('#createButton').click();
     cy.wait('@createNote').then(xhr => {
-      const response = xhr.responseBody;
+      const { data } = xhr.responseBody;
       const status = xhr.status;
 
-      createdNotes.push(response);
-      expect(response.attachment).includes(FILE_NAME);
-      expect(response.content).to.be.equal(NOTE_CONTENT);
+      createdNotes.push(data);
+      expect(data.attachment).includes(FILE_NAME);
+      expect(data.content).to.be.equal(NOTE_CONTENT);
       expect(status).to.be.equal(200);
     });
+  });
+
+  after(() => {
+    const removedNotes = createdNotes.map(note =>
+      cy.removeNote(note.noteId, note.attachment)
+    );
+
+    Promise.all(removedNotes);
   });
 });

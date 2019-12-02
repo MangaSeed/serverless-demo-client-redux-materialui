@@ -4,6 +4,12 @@ import { AppState } from '../reducers';
 
 export const selectAuth = (state: AppState) => state.auth;
 
+/** AUTH ERRORS SELECTOR */
+export const selectAuthErrors = createSelector(
+  selectAuth,
+  ({ activate, signup, signin }) => [activate.error, signup.error, signin.error]
+);
+
 /** CHECK AUTH SELECTORS */
 export const selectAuthCheck = createSelector(selectAuth, auth => auth.check);
 

@@ -29,8 +29,8 @@ const Home: FC<IAppProps> = props => {
       }
 
       try {
-        const notes = await loadNotes();
-        setNotes(notes);
+        const { data } = await loadNotes();
+        setNotes(data);
       } catch (e) {
         alert(e);
       }

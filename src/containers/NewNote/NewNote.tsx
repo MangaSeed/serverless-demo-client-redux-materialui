@@ -4,7 +4,7 @@ import React, {
   FormEvent,
   ChangeEvent,
   FC,
-  useEffect
+  useEffect,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
@@ -13,12 +13,12 @@ import { Button, Container, TextField } from '@material-ui/core';
 import {
   selectNoteCreating,
   selectNoteCreateError,
-  selectNoteCreated
+  selectNoteCreated,
 } from '../../store/selector/note';
 
 import {
   createNoteAction,
-  clearNoteStateAction
+  clearNoteStateAction,
 } from '../../store/reducers/note';
 
 import LoaderButton from '../../components/LoaderButton';
@@ -33,7 +33,7 @@ const NewNote: FC<RouteComponentProps> = ({ history }) => {
   const classes = useNewNoteStyle();
   const file = useRef<File | null>(null);
 
-  const creatingNote = useSelector(selectNoteCreating);
+  const isLoading = useSelector(selectNoteCreating);
   const createNoteError = useSelector(selectNoteCreateError);
   const createdNote = useSelector(selectNoteCreated);
 
@@ -106,7 +106,7 @@ const NewNote: FC<RouteComponentProps> = ({ history }) => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={creatingNote}
+          isLoading={isLoading}
           disabled={!validateForm()}
           fullWidth
         >

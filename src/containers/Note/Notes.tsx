@@ -63,15 +63,15 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
 
     const onLoad = async () => {
       try {
-        const note = await loadNote();
-        const { content, attachment } = note;
+        const { data } = await loadNote();
+        const { content, attachment } = data;
 
         if (attachment) {
-          note.attachmentURL = await Storage.vault.get(attachment);
+          data.attachmentURL = await Storage.vault.get(attachment);
         }
 
         setContent(content);
-        setNote(note);
+        setNote(data);
       } catch (e) {
         alert(e);
       }
