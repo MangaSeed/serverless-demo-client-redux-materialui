@@ -20,8 +20,8 @@ describe('Note - Delete', () => {
       )
       .then(blob => new File([blob], FILE_NAME, { type: blob.type }))
       .then(file => cy.createNote(NOTE_CONTENT, file))
-      .then(res => {
-        createdNote = res;
+      .then(({ data }) => {
+        createdNote = data;
         cy.visit(`/notes/${createdNote.noteId}`);
       });
   });
@@ -46,8 +46,8 @@ describe('Note - Delete', () => {
       .should('be', 200);
 
     cy.wait('@getNotes').then(xhr => {
-      const response = xhr.responseBody;
-      const note = response.filter(note => note.noteId === createdNote.noteId);
+      const { data } = xhr.responseBody;
+      const note = data.filter(note => note.noteId === createdNote.noteId);
       expect(note).to.be.empty;
     });
 

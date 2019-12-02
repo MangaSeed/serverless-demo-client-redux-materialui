@@ -24,8 +24,8 @@ describe('Note - Update', () => {
       )
       .then(blob => new File([blob], FILE_NAME, { type: blob.type }))
       .then(file => cy.createNote(NOTE_CONTENT, file))
-      .then(res => {
-        createdNote = res;
+      .then(({ data }) => {
+        createdNote = data;
         cy.visit(`/notes/${createdNote.noteId}`);
       });
   });
@@ -35,7 +35,7 @@ describe('Note - Update', () => {
       cy.get('#file').upload({
         fileContent,
         fileName: FILE_NAME_LARGE,
-        mimeType: 'image/jpeg'
+        mimeType: 'image/jpeg',
       });
     });
 
@@ -58,7 +58,7 @@ describe('Note - Update', () => {
       cy.get('#file').upload({
         fileContent,
         fileName: FILE_NAME_UPDATED,
-        mimeType: 'image/jpeg'
+        mimeType: 'image/jpeg',
       });
     });
 
@@ -68,8 +68,8 @@ describe('Note - Update', () => {
       .should('be', 200);
 
     cy.wait('@getNotes').then(xhr => {
-      const response = xhr.responseBody;
-      const note = response.filter(note => note.noteId === createdNote.noteId);
+      const { data } = xhr.responseBody;
+      const note = data.filter(note => note.noteId === createdNote.noteId);
 
       createdNote = note[0];
 

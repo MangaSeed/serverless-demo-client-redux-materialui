@@ -14,20 +14,27 @@ export const addNote = async (note: string, attachment?: File) => {
     fileKey = file.key;
   }
 
-  return await API.post(ENDPOINT, '/notes', {
+  const { data } = await API.post(ENDPOINT, '/notes', {
     body: {
       content: note,
       attachment: fileKey,
     },
   });
+
+  return data;
 };
 
 export const fetchNotes = async (): Promise<INote[]> => {
-  return await API.get(ENDPOINT, '/notes', null);
+  const { data } = await API.get(ENDPOINT, '/notes', null);
+  return data;
 };
 
 export const fetchNote = async (id: string): Promise<INote> => {
-  const data: INote = await API.get(ENDPOINT, `/notes/${id}`, null);
+  const { data }: { data: INote } = await API.get(
+    ENDPOINT,
+    `/notes/${id}`,
+    null
+  );
 
   if (data.attachment) {
     const fileAttachment = await fileGet(data.attachment);
@@ -57,9 +64,11 @@ export const updateNote = async (
     fileKey = file.key;
   }
 
-  return await API.put(ENDPOINT, `/notes/${note.noteId}`, {
+  const { data } = await API.put(ENDPOINT, `/notes/${note.noteId}`, {
     body: { ...note, attachment: fileKey },
   });
+
+  return data;
 };
 
 export const billNote = async (storage: number, source: string) => {
