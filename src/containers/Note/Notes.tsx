@@ -68,26 +68,12 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = ({ history, match }) => {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    const loadNote = () => API.get('notes', `/notes/${match.params.id}`, null);
+    dispatch(fetchNoteAction(match.params.id));
+  }, [match.params.id, dispatch]);
 
-    const onLoad = async () => {
-      try {
-        const { data } = await loadNote();
-        const { content, attachment } = data;
-
-        if (attachment) {
-          data.attachmentURL = await Storage.vault.get(attachment);
-        }
-
-        setContent(content);
-        setNote(data);
-      } catch (e) {
-        alert(e);
-      }
-    };
-
-    onLoad();
-  }, [match.params.id]);
+  useEffect(() => {
+    if (fetched && note && note.content) setContent(note.content);
+  }, [note, fetched]);
 
   useEffect(() => {
     if (removed) dispatch(clearNoteStateAction('remove'));
