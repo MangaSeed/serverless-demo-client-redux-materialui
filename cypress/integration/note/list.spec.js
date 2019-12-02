@@ -20,7 +20,7 @@ describe('Note - Update', () => {
       )
       .then(blob => new File([blob], FILE_NAME, { type: blob.type }))
       .then(file => cy.createNote(NOTE_CONTENT, file))
-      .then(res => (createdNote = res));
+      .then(({ data }) => (createdNote = data));
   });
 
   it('can fetch notes and display notes', () => {
