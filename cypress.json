@@ -1,8 +1,8 @@
 {
   "baseUrl": "http://localhost:3000",
   "env": {
-    "mail": "vincent.nocum@gmail.com",
-    "pass": "3ggy0Lk!@#",
+    "mail": "parinjoed@gmail.com",
+    "pass": "Password123$",
     "stage": "dev"
   }
 }

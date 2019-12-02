@@ -20,7 +20,7 @@ describe('Note - Update', () => {
       )
       .then(blob => new File([blob], FILE_NAME, { type: blob.type }))
       .then(file => cy.createNote(NOTE_CONTENT, file))
-      .then(res => (createdNote = res));
+      .then(({ data }) => (createdNote = data));
   });
 
   it('can fetch a note along w/ new file attached', () => {
@@ -50,8 +50,6 @@ describe('Note - Update', () => {
     cy.get('#attachmentLink>a')
       .should('have.attr', 'href')
       .and('contains', createdNote.attachment);
-
-    console.log(createdNote);
   });
 
   after(() => {

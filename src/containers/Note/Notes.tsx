@@ -4,7 +4,7 @@ import React, {
   useEffect,
   FC,
   ChangeEvent,
-  FormEvent
+  FormEvent,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
@@ -15,14 +15,14 @@ import {
   Container,
   Grid,
   TextField,
-  Typography
+  Typography,
 } from '@material-ui/core';
 
 import {
   fetchNoteAction,
   removeNoteAction,
   updateNoteAction,
-  clearNoteStateAction
+  clearNoteStateAction,
 } from '../../store/reducers/note';
 
 import {
@@ -35,7 +35,7 @@ import {
   selectNoteFetched,
   selectNoteFetchData,
   selectNoteFetching,
-  selectNoteFetchError
+  selectNoteFetchError,
 } from '../../store/selector/note';
 
 import LoaderButton from '../../components/LoaderButton';

@@ -8,19 +8,17 @@ import {
   activateAuthAction,
   signInAuthAction,
   checkedAuthAction,
-  resetAuthInnerStateAction
+  resetAuthInnerStateAction,
 } from '../../store/reducers/auth';
 
 import {
   selectAuthSigningUp,
   selectAuthSignedUp,
-  selectAuthSignUpError,
   selectAuthActivating,
   selectAuthActivated,
-  selectAuthActivateError,
   selectAuthSigningIn,
   selectAuthSignedIn,
-  selectAuthSignInError
+  selectAuthErrors,
 } from '../../store/selectors/auth';
 
 import LoaderButton from '../../components/LoaderButton';
@@ -38,7 +36,7 @@ const INITIAL_FORM_FIELDS: IFormFields = {
   email: '',
   password: '',
   confirmPassword: '',
-  confirmationCode: ''
+  confirmationCode: '',
 };
 
 const Signup: FC<RouteComponentProps> = ({ history }) => {
@@ -47,15 +45,15 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
 
   const signingUp = useSelector(selectAuthSigningUp);
   const signedUp = useSelector(selectAuthSignedUp);
-  const signUpError = useSelector(selectAuthSignUpError);
 
   const activating = useSelector(selectAuthActivating);
   const activated = useSelector(selectAuthActivated);
-  const activateError = useSelector(selectAuthActivateError);
 
   const signingIn = useSelector(selectAuthSigningIn);
   const signedIn = useSelector(selectAuthSignedIn);
-  const signInError = useSelector(selectAuthSignInError);
+
+  const isLoading = activating || signingUp || signingIn;
+  const errors = useSelector(selectAuthErrors);
 
   const [fields, handleFieldChange] = useFormFields<IFormFields>(
     INITIAL_FORM_FIELDS
@@ -64,10 +62,8 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
   const { email, password } = fields;
 
   useEffect(() => {
-    if (signUpError) alert(signUpError);
-    if (activateError) alert(activateError);
-    if (signInError) alert(signInError);
-  }, [signUpError, activateError, signInError]);
+    errors.map(error => error && alert(error));
+  }, [errors]);
 
   useEffect(() => {
     if (activated) dispatch(signInAuthAction(email, password));
@@ -122,7 +118,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={activating || signingIn}
+          isLoading={isLoading}
           disabled={!validateConfirmationForm()}
           fullWidth
           id="verify-button"
@@ -173,7 +169,7 @@ const Signup: FC<RouteComponentProps> = ({ history }) => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={signingUp}
+          isLoading={isLoading}
           disabled={!validateForm()}
           id="signup-button"
           fullWidth

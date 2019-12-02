@@ -5,13 +5,13 @@ import { TextField, Container } from '@material-ui/core';
 import {
   signInAuthAction,
   resetAuthInnerStateAction,
-  checkedAuthAction
+  checkedAuthAction,
 } from '../../store/reducers/auth';
 
 import {
   selectAuthSigningIn,
   selectAuthSignedIn,
-  selectAuthSignInError
+  selectAuthSignInError,
 } from '../../store/selectors/auth';
 
 import LoaderButton from '../../components/LoaderButton';
@@ -21,13 +21,13 @@ import { useFormFields } from '../../libs/hooksLib';
 const Signin = () => {
   const dispatch = useDispatch();
 
-  const signingIn = useSelector(selectAuthSigningIn);
+  const isLoading = useSelector(selectAuthSigningIn);
   const signedIn = useSelector(selectAuthSignedIn);
   const signInError = useSelector(selectAuthSignInError);
 
   const [fields, handleFieldChange] = useFormFields({
     email: '',
-    password: ''
+    password: '',
   });
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const Signin = () => {
           type="submit"
           variant="contained"
           color="primary"
-          isLoading={signingIn}
+          isLoading={isLoading}
           disabled={!validateForm()}
           id="signin-button"
           fullWidth
