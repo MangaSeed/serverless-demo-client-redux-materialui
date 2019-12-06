@@ -6,7 +6,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Box
+  Box,
 } from '@material-ui/core';
 import { NoteAdd as NoteAddIcon } from '@material-ui/icons';
 import { API } from 'aws-amplify';
@@ -29,8 +29,8 @@ const Home: FC<IAppProps> = props => {
       }
 
       try {
-        const notes = await loadNotes();
-        setNotes(notes);
+        const { data } = await loadNotes();
+        setNotes(data);
       } catch (e) {
         alert(e);
       }

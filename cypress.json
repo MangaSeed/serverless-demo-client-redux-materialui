@@ -1,3 +1,8 @@
 {
-  "baseUrl": "http://localhost:3000"
+  "baseUrl": "http://localhost:3000",
+  "env": {
+    "mail": "parinjoed@gmail.com",
+    "pass": "Password123$",
+    "stage": "dev"
+  }
 }

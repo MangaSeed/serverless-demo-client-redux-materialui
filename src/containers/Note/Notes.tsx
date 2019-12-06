@@ -5,7 +5,7 @@ import React, {
   FC,
   ChangeEvent,
   FormEvent,
-  MouseEvent
+  MouseEvent,
 } from 'react';
 import { RouteComponentProps } from 'react-router';
 import {
@@ -13,7 +13,7 @@ import {
   Container,
   Grid,
   TextField,
-  Typography
+  Typography,
 } from '@material-ui/core';
 import { API, Storage } from 'aws-amplify';
 
@@ -77,7 +77,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
 
   const saveNote = (note: { content: string; attachment?: string }) =>
     API.put('notes', `/notes/${props.match.params.id}`, {
-      body: note
+      body: note,
     });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -104,7 +104,7 @@ const Notes: FC<RouteComponentProps<{ id: string }>> = props => {
 
       await saveNote({
         content,
-        attachment: attachment || note.attachment
+        attachment: attachment || note.attachment,
       });
       props.history.push('/');
     } catch (e) {

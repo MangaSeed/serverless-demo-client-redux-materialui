@@ -50,31 +50,31 @@ export const SIGNUP_AUTH = 'auth/signUpAuthAction';
 const INIT_AUTH_ACTIVATE_STATE: IAuthActivateState = {
   activated: false,
   activating: false,
-  error: ''
+  error: '',
 };
 
 const INIT_AUTH_SIGNIN_STATE: IAuthSignInState = {
   signedIn: false,
   signingIn: false,
-  error: ''
+  error: '',
 };
 
 const INIT_AUTH_SIGNOUT_STATE: IAuthSignOutState = {
   signedOut: false,
   signingOut: false,
-  error: ''
+  error: '',
 };
 
 const INIT_AUTH_SIGNUP_STATE: IAuthSignUpState = {
   signedUp: false,
   signingUp: false,
-  error: ''
+  error: '',
 };
 
 const INIT_AUTH_CHECK_STATE: IAuthCheckState = {
   checking: false,
   checked: false,
-  error: ''
+  error: '',
 };
 
 const INIT_AUTH_STATE: IAuthState = {
@@ -82,7 +82,7 @@ const INIT_AUTH_STATE: IAuthState = {
   check: INIT_AUTH_CHECK_STATE,
   signin: INIT_AUTH_SIGNIN_STATE,
   signout: INIT_AUTH_SIGNOUT_STATE,
-  signup: INIT_AUTH_SIGNUP_STATE
+  signup: INIT_AUTH_SIGNUP_STATE,
 };
 
 /** AUTH SLICE */
@@ -153,7 +153,7 @@ const authSlice = createSlice({
     resetAuthInnerStateAction: (
       state,
       {
-        payload
+        payload,
       }: PayloadAction<'activate' | 'signin' | 'signout' | 'signup' | 'check'>
     ) => {
       // !IMPORTANT: tried this, weirdly enough typescript is not permitting it
@@ -184,8 +184,8 @@ const authSlice = createSlice({
           state = INIT_AUTH_STATE;
           break;
       }
-    }
-  }
+    },
+  },
 });
 
 /** AUTH ACTIONS */
@@ -199,7 +199,7 @@ export const checkAuthAction = createAction(CHECK_AUTH);
 export const signInAuthAction = createAction(
   SIGNIN_AUTH,
   (email: string, password: string) => ({
-    payload: { email, password }
+    payload: { email, password },
   })
 );
 
@@ -208,7 +208,7 @@ export const signOutAuthAction = createAction(SIGNOUT_AUTH);
 export const signUpAuthAction = createAction(
   SIGNUP_AUTH,
   (email: string, password: string) => ({
-    payload: { email, password }
+    payload: { email, password },
   })
 );
 
@@ -228,7 +228,7 @@ export const {
   signingUpAuthAction,
   signedUpAuthAction,
   signUpErrorAuthAction,
-  resetAuthInnerStateAction
+  resetAuthInnerStateAction,
 } = authSlice.actions;
 
 /** AUTH REDUCER */

@@ -19,7 +19,7 @@ export async function signOut() {
 export async function signUp(email: string, password: string) {
   return await Auth.signUp({
     password,
-    username: email
+    username: email,
   });
 }
 

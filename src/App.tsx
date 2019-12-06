@@ -7,13 +7,13 @@ import { CssBaseline, Button, Container } from '@material-ui/core';
 import {
   checkAuthAction,
   signOutAuthAction,
-  resetAuthInnerStateAction
+  resetAuthInnerStateAction,
 } from './store/reducers/auth';
 
 import {
   selectAuthChecking,
   selectAuthChecked,
-  selectAuthSignedOut
+  selectAuthSignedOut,
 } from './store/selectors/auth';
 
 import Routes from './Routes';
