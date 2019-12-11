@@ -1,6 +1,6 @@
 // THIS COULD BE AN ENV OR CONFIG FILE
-const MAIL = 'vincent.nocum@gmail.com';
-const PASS = '3ggy0Lk!@#';
+const MAIL = 'admin@example.com';
+const PASS = 'Passw0rd!';
 
 const WRONG_MAIL = 'asfasfas@example.com';
 const WRONG_PASS = 'asfajshf123!';

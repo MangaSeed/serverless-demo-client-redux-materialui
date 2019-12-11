@@ -5,7 +5,7 @@ import { authReducer } from './auth';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
-  note: noteReducer
+  note: noteReducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

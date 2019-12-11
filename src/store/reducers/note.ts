@@ -17,8 +17,15 @@ interface INoteCreateState {
   data: INote | null;
 }
 
+interface INoteRemoveState {
+  removing: boolean;
+  removed: boolean;
+  error: string;
+}
+
 interface INoteState {
   create: INoteCreateState;
+  remove: INoteRemoveState;
 }
 
 export interface ICreateNotePayload {
@@ -26,26 +33,44 @@ export interface ICreateNotePayload {
   attachment?: File;
 }
 
+export interface IRemoveNotePayload {
+  id: string;
+  fileName?: string;
+}
+
 interface ICreateNoteAction {
   payload: ICreateNotePayload;
+}
+
+interface IRemoveNoteAction {
+  payload: IRemoveNotePayload;
 }
 
 /** NOTE ACTION TYPES */
 
 type CreateNoteActionType = (params: ICreateNotePayload) => ICreateNoteAction;
+type RemoveNoteActionType = (params: IRemoveNotePayload) => IRemoveNoteAction;
 
 /** NOTE CONSTANTS */
-export const CREATE_NOTE = `note/createNoteAction`;
+export const CREATE_NOTE = 'note/createNoteAction';
+export const REMOVE_NOTE = 'note/removeNoteAction';
 
 const INIT_NOTE_CREATE_STATE: INoteCreateState = {
   creating: false,
   created: false,
   error: '',
-  data: null
+  data: null,
+};
+
+const INIT_NOTE_REMOVE_STATE: INoteRemoveState = {
+  removing: false,
+  removed: false,
+  error: '',
 };
 
 const INIT_NOTE_STATE: INoteState = {
-  create: INIT_NOTE_CREATE_STATE
+  create: INIT_NOTE_CREATE_STATE,
+  remove: INIT_NOTE_REMOVE_STATE,
 };
 
 /** NOTE SLICE CONFIG */
@@ -61,21 +86,38 @@ const noteSlice = createSlice({
       state.create = {
         ...INIT_NOTE_CREATE_STATE,
         created: true,
-        data: payload
+        data: payload,
       };
     },
 
     createNoteErrorAction: (state, { payload }: PayloadAction<string>) => {
       state.create = {
         ...INIT_NOTE_CREATE_STATE,
-        error: payload
+        error: payload,
       };
     },
 
-    clearNoteStateAction: (state, { payload }: PayloadAction<'create'>) => {
-      state[payload] = INIT_NOTE_STATE[payload];
-    }
-  }
+    removingNoteAction: state => {
+      state.remove = { ...INIT_NOTE_REMOVE_STATE, removing: true };
+    },
+
+    removedNoteAction: state => {
+      state.remove = { ...INIT_NOTE_REMOVE_STATE, removed: true };
+    },
+
+    removeNoteErrorAction: (state, { payload }: PayloadAction<string>) => {
+      state.remove = { ...INIT_NOTE_REMOVE_STATE, error: payload };
+    },
+
+    clearNoteStateAction: (
+      state,
+      { payload }: PayloadAction<'create' | 'remove'>
+    ) => {
+      (state[payload] as typeof state[typeof payload]) = INIT_NOTE_STATE[
+        payload
+      ];
+    },
+  },
 });
 
 /** NOTE ACTION CREATORS */
@@ -84,11 +126,19 @@ export const createNoteAction = createAction<
   typeof CREATE_NOTE
 >(CREATE_NOTE, params => ({ payload: params }));
 
+export const removeNoteAction = createAction<
+  RemoveNoteActionType,
+  typeof REMOVE_NOTE
+>(REMOVE_NOTE, params => ({ payload: params }));
+
 export const {
+  clearNoteStateAction,
   creatingNoteAction,
   createdNoteAction,
   createNoteErrorAction,
-  clearNoteStateAction
+  removedNoteAction,
+  removeNoteErrorAction,
+  removingNoteAction,
 } = noteSlice.actions;
 
 /** NOTE REDUCER */
